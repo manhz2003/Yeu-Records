@@ -1,0 +1,18 @@
+package org.manhdev.testcrudspringboot.dto.response;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class DigitalSignatureResponse {
+    String id;
+    String publicKey;
+    String certificate;
+    String digitalSignature;
+    String createdAt;
+    String updatedAt;
+}

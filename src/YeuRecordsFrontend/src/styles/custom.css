@@ -1,0 +1,271 @@
+.custom-border {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin: 3px;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #ccc;
+  border-radius: 20%;
+}
+
+body {
+  background-color: #f1f1f1;
+  font-family: "Ubuntu", sans-serif;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+}
+
+div[ref="contentRef"] {
+  width: 100%;
+  max-width: 595px;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Đảm bảo các đoạn văn bản không bị cắt */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+li {
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* Đảm bảo thanh cuộn không chiếm diện tích khi không hover */
+.scrollbar-visible {
+  overflow-y: scroll;
+}
+
+/* Thanh cuộn cơ bản sẽ không hiển thị khi không hover */
+.scrollbar-visible::-webkit-scrollbar {
+  width: 0px; /* Ẩn thanh cuộn */
+}
+
+/* Khi hover, thanh cuộn sẽ xuất hiện với kích thước nhỏ */
+.scrollbar-visible:hover::-webkit-scrollbar {
+  width: 4px;
+}
+
+/* Tùy chỉnh phần tay cầm của thanh cuộn */
+.scrollbar-visible::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+}
+
+/* Đảm bảo thanh cuộn không chiếm diện tích trong phần tử */
+.scrollbar-visible::-webkit-scrollbar-track {
+  background: transparent; /* Thay đổi màu nền của track thanh cuộn */
+}
+
+/* Hiệu ứng mở rộng viền từ giữa ra ngoài */
+@keyframes contactBorderExpand {
+  0% {
+    clip-path: polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%);
+  }
+  50% {
+    clip-path: polygon(0 50%, 100% 50%, 100% 50%, 0 50%);
+  }
+  100% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+}
+
+.contact-link {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Viền của liên kết */
+.contact-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  pointer-events: none;
+  transform: scaleX(0);
+  transition: transform 0s ease-out, border-color 0.3s ease;
+}
+
+/* Khi hover vào, kéo viền ra từ giữa */
+.contact-link:hover::before {
+  border-color: #0f217f;
+  transform: scaleX(1);
+}
+
+/* 
+ */
+
+/* Thanh trượt (input[type="range"]) */
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%; /* Chiều rộng full */
+  height: 5px; /* Độ dày của thanh */
+  background: #d3d3d3; /* Màu nền của thanh */
+  border-radius: 8px; /* Bo góc thanh */
+  outline: none;
+  transition: background 0.3s ease;
+}
+
+/* Thanh trượt khi đang được kéo */
+input[type="range"]:active {
+  background: #707070; /* Màu khi kéo */
+}
+
+/* Tùy chỉnh núm kéo cho Chrome/Safari */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px; /* Kích thước núm kéo */
+  height: 12px;
+  border-radius: 50%;
+  background: #ffffff; /* Màu núm kéo */
+  border: 2px solid #707070; /* Viền núm kéo */
+  cursor: pointer;
+  opacity: 0.8; /* Mờ nhẹ */
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Hiển thị rõ núm kéo khi hover */
+input[type="range"]:hover::-webkit-slider-thumb {
+  opacity: 1;
+  transform: scale(1.2); /* Tăng kích thước khi hover */
+}
+
+/* Tùy chỉnh núm kéo cho Firefox */
+input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #707070;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Hiển thị rõ núm kéo khi hover (Firefox) */
+input[type="range"]:hover::-moz-range-thumb {
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+.pagination-container {
+  overflow-x: auto; /* Thêm thanh cuộn ngang khi cần */
+  white-space: nowrap; /* Ngừng việc tự động xuống dòng */
+}
+
+/* Tùy chỉnh toàn bộ cửa sổ */
+.custom-swal-popup {
+  font-weight: 300;
+  font-family: "Ubuntu", sans-serif;
+  font-size: 14px;
+  border-radius: 6px;
+}
+
+/* Tiêu đề */
+.custom-swal-title {
+  color: #333;
+  font-weight: bold;
+  font-size: 16px;
+  text-transform: uppercase;
+  font-weight: 400;
+  font-family: "Ubuntu", sans-serif;
+  line-height: 22px;
+}
+
+/* Input */
+.custom-swal-input {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  font-weight: 300;
+  font-family: "Ubuntu", sans-serif;
+}
+
+/* Nút Submit */
+.custom-swal-confirm-btn {
+  background-color: #000 !important;
+  color: #fff !important;
+  font-weight: 400;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-family: "Ubuntu", sans-serif;
+}
+
+/* Nút Cancel */
+.custom-swal-cancel-btn {
+  background-color: #6b7281 !important;
+  color: #fff !important;
+  font-weight: 400;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-family: "Ubuntu", sans-serif;
+}
+
+.saving-text {
+  display: inline-block;
+}
+
+.dot {
+  display: inline-block;
+  animation: blink 1.5s infinite step-start;
+  opacity: 0;
+}
+
+.dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Mặc định trên PC (kích thước nhỏ hơn) */
+input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* Tăng kích thước trên mobile */
+@media (max-width: 768px) {
+  input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* Chỉ áp dụng cho checkbox trong bảng */
+.table input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .table input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+  }
+}
+
