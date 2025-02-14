@@ -167,6 +167,39 @@ const DigitalSignature = () => {
           <p><strong>Email:</strong> ${certificate}</p>
         `,
       });
+
+      // Tự động lấy email từ certificate nếu cần
+      const emailFromCertificate = certificate; // Nếu email đã có trong certificate, bạn có thể lấy từ đây.
+
+      // Gửi yêu cầu xác minh chữ ký mà không cần phải nhập lại form
+      const requestData = {
+        digitalSignature,
+        publicKey,
+        user: { email: emailFromCertificate },
+      };
+
+      const response = await apiVerifySignature(requestData);
+      if (response.status === 200) {
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Digital signature has been successfully authenticated!",
+        });
+
+        Swal.fire({
+          icon: "info",
+          title: "User Information",
+          html: `
+            <p><strong>Verify Signature:</strong> ${response?.data.result.signatureValid}</p>
+          `,
+        });
+      } else if (response.status === 400) {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: response.data.error,
+        });
+      }
     } catch (error) {
       setMusicInfo(null);
       Swal.fire({
@@ -227,55 +260,6 @@ const DigitalSignature = () => {
               </p>
             </div>
           )}
-        </div>
-        <div className="w-full shadow p-4 rounded-[6px] bg-white flex flex-col gap-4">
-          <div className="text-[#000] font-medium text-[17px] mb-0 hidden sm:block">
-            Digital Signature
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div>
-              <label className="text-sm font-semibold">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="w-full p-2 border rounded-md"
-                required
-              />
-            </div>
-            <div>
-              <label className="text-sm font-semibold">Digital Signature</label>
-              <input
-                type="text"
-                value={digitalSignature}
-                onChange={(e) => setDigitalSignature(e.target.value)}
-                placeholder="Enter digital signature"
-                className="w-full p-2 border rounded-md"
-                required
-              />
-            </div>
-            <div>
-              <label className="text-sm font-semibold">Public Key</label>
-              <input
-                type="text"
-                value={publicKey}
-                onChange={(e) => setPublicKey(e.target.value)}
-                placeholder="Enter public key"
-                className="w-full p-2 border rounded-md"
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="bg-[#000] text-white p-2 rounded-md "
-            >
-              Submit
-            </button>
-          </form>
         </div>
       </div>
     </>
