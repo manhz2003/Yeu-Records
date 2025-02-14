@@ -9,7 +9,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 // các package con của nó, sau đó đưa vào Spring container. Mặc định, @SpringBootApplication
 // đã tự động quét package nơi nó được định nghĩa và các package con. Khi sử dụng
 // @ComponentScan, ta có thể chỉ định riêng khu vực cần quét, ví dụ:
-
 // @ComponentScan("org.manhdev.testcrudspringboot.controller")
 
 public class SpringBootServer {

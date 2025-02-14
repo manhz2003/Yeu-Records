@@ -45,7 +45,7 @@ public class ApplicationInitConfig {
             if (userRepository.findByEmail(ADMIN_USER_NAME).isEmpty()) {
                 roleRepository.save(Role.builder()
                         .name(PredefinedRole.USER_ROLE)
-                        .description("Đây là quyền của user")
+                        .description("Đây là quyền của nghệ sĩ")
                         .build());
 
                 Role adminRole = roleRepository.save(Role.builder()

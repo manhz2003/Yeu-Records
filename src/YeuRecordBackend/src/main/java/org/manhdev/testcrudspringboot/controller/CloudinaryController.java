@@ -16,7 +16,6 @@ import java.util.Map;
 public class CloudinaryController {
 
     CloudinaryService cloudinaryService;
-
     // Xóa file
     @DeleteMapping("/delete/{publicId}")
     public ResponseEntity<?> deleteFile(@PathVariable String publicId) {

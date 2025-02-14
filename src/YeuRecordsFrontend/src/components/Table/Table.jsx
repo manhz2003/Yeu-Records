@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 const Table = ({
   data,
@@ -13,6 +13,7 @@ const Table = ({
   actionIcons,
   onEdit,
   onDelete,
+  onDownload, // Hàm download
 }) => {
   const totalPages = Math.ceil(totalItems / pageSize);
 
@@ -57,7 +58,6 @@ const Table = ({
         window.open(`${value}`, "_blank", "noopener noreferrer");
         break;
       case "Telegram":
-        // Đối với Telegram, mở link với số điện thoại hoặc username
         window.open(`https://t.me/${value}`, "_blank", "noopener noreferrer");
         break;
       case "Facebook":
@@ -154,7 +154,6 @@ const Table = ({
                     "digitalAppleMusic",
                     "digitalTiktok",
                   ].includes(col.accessor) ? (
-                    // Hiển thị tên dễ hiểu và mở link với giá trị
                     <button
                       onClick={() =>
                         handleRedirect(
@@ -216,6 +215,14 @@ const Table = ({
                   }
                 >
                   {actionIcons?.delete}
+                </button>
+
+                {/* Nút Download */}
+                <button
+                  className="text-green-500 hover:text-green-700 mx-1"
+                  onClick={() => onDownload(row)} // Xử lý tải xuống
+                >
+                  {actionIcons?.download} {/* Hiển thị icon download */}
                 </button>
               </td>
             </tr>

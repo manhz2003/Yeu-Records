@@ -6,9 +6,13 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.manhdev.testcrudspringboot.exception.AppException;
+import org.manhdev.testcrudspringboot.exception.ErrorCode;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 
 @Service
@@ -22,15 +26,23 @@ public class CloudinaryService {
     public Map<String, Object> deleteFile(String publicId, String resourceType) throws IOException {
         log.info("Deleting file with publicId: {} and resourceType: {}", publicId, resourceType);
 
-        // Gửi yêu cầu xóa file đến Cloudinary với resource_type là linh hoạt
-        // nếu file ảnh resourceType là raw, pdf là image, mp3 là video
-        // với ảnh resource_type là raw thì cần có đuôi mở rộng, còn với mp3 hay pdf thì k cần
-        Map<String, Object> result = cloudinary.uploader().destroy(
-                publicId,
-                ObjectUtils.asMap("resource_type", resourceType)
-        );
+        if (publicId == null || publicId.trim().isEmpty()) {
+            log.warn("Skipping delete: publicId is null or empty");
+            return Collections.singletonMap("message", "Skipped delete: Invalid publicId");
+        }
 
-        log.info("Cloudinary delete response: {}", result);
-        return result;
+        try {
+            Map<String, Object> result = cloudinary.uploader().destroy(
+                    publicId,
+                    ObjectUtils.asMap("resource_type", resourceType)
+            );
+
+            log.info("Cloudinary delete response: {}", result);
+            return result;
+        } catch (RuntimeException e) {
+            log.error("Cloudinary delete failed: {}", e.getMessage());
+            return Collections.singletonMap("error", "Cloudinary delete failed: " + e.getMessage());
+        }
     }
+
 }

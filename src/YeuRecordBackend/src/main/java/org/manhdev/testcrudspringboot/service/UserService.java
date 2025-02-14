@@ -1,6 +1,5 @@
 package org.manhdev.testcrudspringboot.service;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -100,29 +99,33 @@ public class UserService {
         // Chuyển đổi sang UserResponse và gán thêm trường totalMusic
         UserResponse response = userMapper.toUserResponse(user);
         response.setTotalMusic(totalMusic);
-
         return response;
     }
 
     //    update user
     public UserResponse updateUser(String userId, UpdateUserRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(MessageConstant.USER_NOT_FOUND));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.USER_NOT_FOUND));
+
         if (userRepository.existsByPhoneAndIdNot(request.getPhone(), userId)) {
             throw new ConflictException(MessageConstant.PHONE_CONFLIG);
         }
 
-        // Nếu người dùng có ảnh cũ, xóa ảnh đó trên Cloudinary
+        // Nếu avatar thay đổi, kiểm tra và xóa ảnh cũ trên Cloudinary
         if (user.getAvatar() != null && !user.getAvatar().equals(request.getAvatar())) {
+            String oldAvatarPublicId = getPublicIdFromUrl(user.getAvatar());
+
             try {
-                String oldAvatarPublicId = getPublicIdFromUrl(user.getAvatar());
                 cloudinaryService.deleteFile(oldAvatarPublicId, "raw");
-            } catch (IOException e) {
-                log.error("Error deleting old avatar: {}", e.getMessage());
+            } catch (Exception e) {
+                log.warn("Skipping Cloudinary deletion due to error: {}", e.getMessage());
             }
         }
 
+        // Cập nhật thông tin user
         userMapper.updateUser(user, request);
         User updatedUser = userRepository.save(user);
+
         return userMapper.toUserResponse(updatedUser);
     }
 

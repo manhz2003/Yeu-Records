@@ -61,6 +61,8 @@ const PlayMusic = React.memo(({ receivedDataAlbum, receivedDataAlbumId }) => {
     }
   };
 
+  console.log(listMusic);
+
   // chuyển từ fake data sang data thật
   useEffect(() => {
     if (!listMusic || listMusic.length === 0) {

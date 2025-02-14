@@ -191,7 +191,7 @@ const DigitalSignature = () => {
               <label className="text-sm font-semibold">Upload Music File</label>
               <input
                 type="file"
-                accept="audio/mpeg"
+                accept="audio/mpeg, audio/wav"
                 onChange={(e) => setFile(e.target.files[0])}
                 className="w-full p-2 border rounded-md"
               />

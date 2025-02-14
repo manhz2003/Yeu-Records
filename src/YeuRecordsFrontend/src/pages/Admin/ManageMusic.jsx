@@ -17,6 +17,7 @@ const {
   MdCalendarMonth,
   IoIosToday,
   CiSquareQuestion,
+  BsCloudDownload,
 } = icons;
 
 const ManageMusic = () => {
@@ -43,6 +44,54 @@ const ManageMusic = () => {
   useEffect(() => {
     fetchDataCategory();
   }, []);
+
+  const handleDownload = (row) => {
+    const fileUrl = row?.musicUrl; // Lấy URL từ dữ liệu hàng
+
+    if (fileUrl) {
+      // Tạo một liên kết tạm thời
+      const link = document.createElement("a");
+      link.href = fileUrl; // Đặt đường dẫn tải xuống
+      link.download = row?.musicName || "yeurecord"; // Đặt tên file nếu có
+
+      // Kiểm tra để đảm bảo rằng file URL có thể tải xuống trực tiếp
+      // Nếu fileUrl chứa "cloudinary", dùng cách thay thế cho các URL nếu cần
+      if (fileUrl.includes("cloudinary")) {
+        // Tạo một HTTP request để kiểm tra file trước khi tải xuống
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", fileUrl, true);
+        xhr.responseType = "blob"; // Lấy file dưới dạng blob
+
+        xhr.onload = () => {
+          const blob = xhr.response;
+          const url = window.URL.createObjectURL(blob);
+          link.href = url;
+          link.download = row?.musicName || "yeurecord"; // Đặt tên file
+
+          // Kích hoạt tải xuống
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          // Giải phóng đối tượng URL
+          window.URL.revokeObjectURL(url);
+        };
+
+        xhr.onerror = () => {
+          console.log("Error loading the file.");
+        };
+
+        xhr.send(); // Gửi request để lấy file
+      } else {
+        // Nếu không cần xử lý thêm (chỉ cần tải file từ URL), kích hoạt tải xuống ngay
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } else {
+      console.log("Không có URL để tải xuống");
+    }
+  };
 
   const fetchDataMusic = async () => {
     try {
@@ -272,7 +321,8 @@ const ManageMusic = () => {
             totalItems={totalItems}
             onPageSizeChange={handlePageSizeChange}
             onDelete={handleDelete}
-            actionIcons={{ delete: <FiTrash /> }}
+            onDownload={handleDownload}
+            actionIcons={{ delete: <FiTrash />, download: <BsCloudDownload /> }}
           />
         </div>
 
