@@ -13,7 +13,7 @@ const Table = ({
   actionIcons,
   onEdit,
   onDelete,
-  onDownload, // Hàm download
+  onDownload,
 }) => {
   const totalPages = Math.ceil(totalItems / pageSize);
 
@@ -180,7 +180,7 @@ const Table = ({
                 </td>
               ))}
 
-              <td className="p-2 border border-gray-300 text-center">
+              <td className="p-2 border border-gray-300 text-center flex">
                 {/* Nút Edit */}
                 <button
                   className={`text-blue-500 hover:text-blue-700 mx-1 ${

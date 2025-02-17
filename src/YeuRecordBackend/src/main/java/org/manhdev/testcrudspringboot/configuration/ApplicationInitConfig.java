@@ -86,7 +86,7 @@ public class ApplicationInitConfig {
             }
 
             // Kiểm tra và tạo các trạng thái StatusMusic
-            List<String> predefinedStatuses = List.of("Chờ kiểm duyệt", "Đang kiểm duyệt", "Đã kiểm duyệt", "Đã xuất bản");
+            List<String> predefinedStatuses = List.of("Waiting for censorship", "Censor", "Published");
             for (String statusName : predefinedStatuses) {
                 if (statusMusicRepository.findByNameStatus(statusName).isEmpty()) {
                     StatusMusic status = statusMusicRepository.save(StatusMusic.builder()

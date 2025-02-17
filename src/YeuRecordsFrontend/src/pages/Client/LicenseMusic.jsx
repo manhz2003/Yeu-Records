@@ -18,6 +18,7 @@ const LicenseMusic = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const [dataMusic, setDataMusic] = useState();
   const [dataArtist, setDataArtist] = useState();
+  const [musicName, setMusicName] = useState();
 
   // xử lý export ra PDF
   const handleExportPDF = () => {
@@ -48,6 +49,12 @@ const LicenseMusic = () => {
   useEffect(() => {
     const savedData = localStorage.getItem("submittedMusicData");
     const data = JSON.parse(localStorage.getItem("userInfo"));
+
+    const dataMusicRaw = localStorage.getItem("musicDataStorage");
+    if (dataMusicRaw) {
+      const dataMusic = JSON.parse(dataMusicRaw);
+      setMusicName(dataMusic[0]?.musicName);
+    }
 
     if (savedData) {
       let data = JSON.parse(savedData);
@@ -220,7 +227,7 @@ const LicenseMusic = () => {
           (hereafter referred to as the “LICENSOR”), in regards to the musical
           composition embodied in the{" "}
           <strong className=" font-normal">
-            "{removeAccents(dataMusic?.musicName || "")}"
+            "{removeAccents(musicName || "")}"
           </strong>{" "}
           (hereafter referred to as the “Work”) on the date of the signing of
           this agreement set forth below.

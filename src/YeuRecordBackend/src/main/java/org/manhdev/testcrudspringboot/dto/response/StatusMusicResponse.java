@@ -8,17 +8,9 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MusicResponse {
+public class StatusMusicResponse {
     String id;
-    String fullName;
-    String categoryName;
-    String albumName;
-    String musicName;
-    String description;
-    String fileFormat;
-    String musicUrl;
-    String thumbnailUrl;
-    String statusMusic;
+    String nameStatus;
     String createdAt;
     String updatedAt;
 }

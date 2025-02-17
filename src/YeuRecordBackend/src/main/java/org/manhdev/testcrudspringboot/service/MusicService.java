@@ -6,26 +6,23 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.manhdev.testcrudspringboot.constant.MessageConstant;
 import org.manhdev.testcrudspringboot.dto.request.MusicRequest;
+import org.manhdev.testcrudspringboot.dto.request.UpdateMusicStatusRequest;
 import org.manhdev.testcrudspringboot.dto.response.MusicResponse;
 import org.manhdev.testcrudspringboot.dto.response.StatisticsMusicResponse;
 import org.manhdev.testcrudspringboot.exception.ResourceNotFoundException;
 import org.manhdev.testcrudspringboot.mapper.MusicMapper;
-import org.manhdev.testcrudspringboot.model.Album;
-import org.manhdev.testcrudspringboot.model.Category;
-import org.manhdev.testcrudspringboot.model.Music;
-import org.manhdev.testcrudspringboot.model.User;
-import org.manhdev.testcrudspringboot.repository.AlbumRepository;
-import org.manhdev.testcrudspringboot.repository.CategoryRepository;
-import org.manhdev.testcrudspringboot.repository.MusicRepository;
-import org.manhdev.testcrudspringboot.repository.UserRepository;
+import org.manhdev.testcrudspringboot.model.*;
+import org.manhdev.testcrudspringboot.repository.*;
 import org.manhdev.testcrudspringboot.util.UserAccessUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import static org.manhdev.testcrudspringboot.util.HandleStringCloudinary.getPublicIdFromUrl;
 
@@ -40,6 +37,7 @@ public class MusicService {
     AlbumRepository albumRepository;
     MusicMapper musicMapper;
     CloudinaryService cloudinaryService;
+    StatusMusicRepository statusMusicRepository;
 
     //    create music
     public MusicResponse createMusic(MusicRequest request) {
@@ -50,13 +48,22 @@ public class MusicService {
                 .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.CATEGORY_NOT_FOUND));
 
         Album album = null;
-
         if (request.getAlbumId() != null && StringUtils.hasText(request.getAlbumId())) {
             album = albumRepository.findById(request.getAlbumId())
                     .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.ALBUM_NOT_FOUND));
         }
 
+        Optional<StatusMusic> defaultStatusOpt = statusMusicRepository.findByNameStatus(MessageConstant.DEFAULT_STATUS);
+        if (defaultStatusOpt.isEmpty()) {
+            throw new ResourceNotFoundException(MessageConstant.STATUS_MUSIC_NOT_FOUND);
+        }
+
+        StatusMusic defaultStatus = defaultStatusOpt.get();
+
+        // Ánh xạ dữ liệu
         Music music = musicMapper.toEntity(request, user, category, album);
+        music.setStatusMusic(defaultStatus);
+
         musicRepository.save(music);
         return musicMapper.toResponse(music);
     }
@@ -187,5 +194,22 @@ public class MusicService {
     public Long deleteOrphanMusic() {
         return musicRepository.deleteByLicensesIsNull();
     }
+
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    public List<MusicResponse> updateStatusForMultipleMusic(UpdateMusicStatusRequest request) {
+        StatusMusic statusMusic = statusMusicRepository.findById(request.getStatusMusicId())
+                .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.STATUS_MUSIC_NOT_FOUND));
+
+        List<Music> musicList = musicRepository.findAllById(request.getMusicIds());
+        if (musicList.isEmpty()) {
+            throw new ResourceNotFoundException(MessageConstant.MUSIC_NOT_FOUND);
+        }
+
+        musicList.forEach(music -> music.setStatusMusic(statusMusic));
+        musicRepository.saveAll(musicList);
+
+        return musicList.stream().map(musicMapper::toResponse).toList();
+    }
+
 
 }

@@ -10,3 +10,4 @@ export * from "./category";
 export * from "./music";
 export * from "./payment";
 export * from "./digitalSignature";
+export * from "./statusMusic";

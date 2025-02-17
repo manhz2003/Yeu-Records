@@ -7,7 +7,11 @@ import {
   apiGetAllMusicByIdCategory,
   apiDeleteMusicById,
   apiGetAllCategory,
+  apiGetAllStatusMusic,
+  apiUpdateStatusMusic,
 } from "../../apis";
+import { toast } from "react-toastify";
+import { data } from "autoprefixer";
 
 const {
   IoSearch,
@@ -18,6 +22,7 @@ const {
   IoIosToday,
   CiSquareQuestion,
   BsCloudDownload,
+  TbStatusChange,
 } = icons;
 
 const ManageMusic = () => {
@@ -29,6 +34,9 @@ const ManageMusic = () => {
   const [pageSize, setPageSize] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [listMusic, setListMusic] = useState([]);
+  const [statusMusic, setStatusMusic] = useState();
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedRows, setSelectedRows] = useState([]);
 
   const fetchDataCategory = async () => {
     try {
@@ -125,6 +133,7 @@ const ManageMusic = () => {
       musicUrl: music.musicUrl,
       thumbnailUrl: music.thumbnailUrl,
       artist: music.fullName,
+      statusMusic: music.statusMusic,
     }));
 
     setListMusic(updatedListMusic);
@@ -196,6 +205,7 @@ const ManageMusic = () => {
     { label: "Category Name", accessor: "categoryName" },
     { label: "Album Name", accessor: "album_name" },
     { label: "collab", accessor: "description" },
+    { label: "Status Music", accessor: "statusMusic" },
     { label: "Created At", accessor: "createdAt" },
     { label: "Updated At", accessor: "updatedAt" },
   ];
@@ -213,6 +223,62 @@ const ManageMusic = () => {
   const filteredMusic = dataMusic?.musics.filter((music) =>
     music.musicName.toLowerCase().includes(searchValue.toLowerCase())
   );
+
+  const handleCheckboxChange = (id, isChecked) => {
+    if (id === "all") {
+      if (isChecked) {
+        setSelectedRows(data.map((row) => row.id));
+      } else {
+        setSelectedRows([]);
+      }
+    } else {
+      setSelectedRows((prev) =>
+        isChecked ? [...prev, id] : prev.filter((rowId) => rowId !== id)
+      );
+    }
+  };
+
+  const fetchDataStatusMusic = async () => {
+    try {
+      const response = await apiGetAllStatusMusic();
+      if (response.status === 200) {
+        setStatusMusic(response.data.result);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDataStatusMusic();
+  }, []);
+
+  const handleStatusChange = (status) => {
+    setSelectedStatus(status);
+  };
+
+  const handleChangeStatusMusic = async () => {
+    if (selectedRows.length === 0 || selectedStatus.length === 0) {
+      toast.error("Please select the track and change status.");
+      return;
+    }
+
+    try {
+      const data = {
+        musicIds: selectedRows,
+        statusMusicId: selectedStatus,
+      };
+
+      const response = await apiUpdateStatusMusic(data);
+      if (response.status === 200) {
+        toast.success("Update track status successfully");
+        fetchDataMusic();
+      }
+    } catch (error) {
+      toast.error(error);
+      console.log(error);
+    }
+  };
 
   return (
     <>
@@ -263,6 +329,7 @@ const ManageMusic = () => {
             </div>
           </div>
         </div>
+
         <div className="w-full shadow p-4 rounded-[6px] bg-[#fff] flex items-center gap-5 select-none">
           <div className="flex flex-wrap items-center gap-3">
             <select
@@ -279,6 +346,42 @@ const ManageMusic = () => {
                 </option>
               ))}
             </select>
+
+            <div
+              className="flex items-center gap-2 p-3 bg-[#000] text-[#fff] rounded-[6px] cursor-pointer sm:w-auto w-full"
+              onClick={handleChangeStatusMusic}
+            >
+              <TbStatusChange />
+              <div>Change Status Music</div>
+            </div>
+
+            <div className="flex gap-4">
+              {statusMusic?.map((status) => (
+                <label
+                  key={status?.id}
+                  className="flex items-center space-x-2 cursor-pointer"
+                >
+                  <input
+                    type="radio"
+                    name="statusMusic"
+                    value={status?.id} // Lưu trữ ID thay vì name
+                    checked={selectedStatus === status.id} // Kiểm tra ID thay vì name
+                    onChange={() => handleStatusChange(status.id)} // Gửi ID khi thay đổi
+                    className="hidden"
+                  />
+                  <span
+                    className={`w-5 h-5 flex justify-center items-center border-2 rounded-full ${
+                      selectedStatus === status.id
+                        ? "bg-blue-500 border-blue-500 text-white"
+                        : "border-gray-400"
+                    }`}
+                  >
+                    {selectedStatus === status.id && "●"}
+                  </span>
+                  <span>{status.nameStatus}</span>
+                </label>
+              ))}
+            </div>
           </div>
         </div>
         <div className="w-full flex flex-col gap-4 shadow p-4 rounded-[6px] bg-[#fff]">
@@ -322,6 +425,10 @@ const ManageMusic = () => {
             onPageSizeChange={handlePageSizeChange}
             onDelete={handleDelete}
             onDownload={handleDownload}
+            selectedRows={selectedRows}
+            setSelectedRows={setSelectedRows}
+            onCheckboxChange={handleCheckboxChange}
+            enableCheckbox={true}
             actionIcons={{ delete: <FiTrash />, download: <BsCloudDownload /> }}
           />
         </div>

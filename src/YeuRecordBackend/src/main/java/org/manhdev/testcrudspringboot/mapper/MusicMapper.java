@@ -15,6 +15,7 @@ public interface MusicMapper {
     @Mapping(source = "user.fullname", target = "fullName")
     @Mapping(source = "category.categoryName", target = "categoryName")
     @Mapping(source = "album.albumName", target = "albumName")
+    @Mapping(source = "statusMusic.nameStatus", target = "statusMusic")
     @Mapping(target = "createdAt", expression = "java(music.getCreatedAt() != null ? music.getCreatedAt().toString() : null)")
     @Mapping(target = "updatedAt", expression = "java(music.getUpdatedAt() != null ? music.getUpdatedAt().toString() : null)")
     MusicResponse toResponse(Music music);

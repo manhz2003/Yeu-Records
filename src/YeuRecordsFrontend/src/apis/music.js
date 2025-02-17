@@ -39,3 +39,10 @@ export const apiUpdateMusicAlbumId = (musicId, albumId) =>
     url: `/music/${musicId}/album/${albumId}`,
     method: "put",
   });
+
+export const apiUpdateStatusMusic = (data) =>
+  instance({
+    url: `music/update-status`,
+    data,
+    method: "put",
+  });

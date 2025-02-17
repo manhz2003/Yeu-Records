@@ -395,7 +395,7 @@ const PlayMusic = React.memo(({ receivedDataAlbum, receivedDataAlbumId }) => {
                       </div>
                     )}
                   </div>
-                  <div className="flex-1">
+                  <div className="flex items-center">
                     <div
                       className="font-medium truncate md:max-w-[800px] max-w-[250px]"
                       title={item?.musicName}
@@ -403,6 +403,9 @@ const PlayMusic = React.memo(({ receivedDataAlbum, receivedDataAlbumId }) => {
                       {item?.musicName}
                     </div>
                   </div>
+
+                  <div className="ml-[30px]">[{item?.statusMusic}]</div>
+
                   {hoveredIndex === index && (
                     <div
                       onClick={(e) => {

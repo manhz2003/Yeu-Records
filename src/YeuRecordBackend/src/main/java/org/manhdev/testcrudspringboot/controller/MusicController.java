@@ -8,6 +8,7 @@ import org.manhdev.testcrudspringboot.constant.MessageConstant;
 import org.manhdev.testcrudspringboot.constant.PaginationConstants;
 import org.manhdev.testcrudspringboot.dto.request.ApiResponse;
 import org.manhdev.testcrudspringboot.dto.request.MusicRequest;
+import org.manhdev.testcrudspringboot.dto.request.UpdateMusicStatusRequest;
 import org.manhdev.testcrudspringboot.dto.response.MusicResponse;
 import org.manhdev.testcrudspringboot.dto.response.StatisticsMusicResponse;
 import org.manhdev.testcrudspringboot.service.MusicService;
@@ -95,6 +96,21 @@ public class MusicController {
                 .message("Updated album ID successfully")
                 .result(updatedMusic)
                 .build();
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @PutMapping("/update-status")
+    public ResponseEntity<ApiResponse<List<MusicResponse>>> updateStatusForMultipleMusic(
+            @RequestBody @Valid UpdateMusicStatusRequest request) {
+
+        List<MusicResponse> updatedMusics = musicService.updateStatusForMultipleMusic(request);
+
+        ApiResponse<List<MusicResponse>> apiResponse = ApiResponse.<List<MusicResponse>>builder()
+                .code(HttpStatus.OK.value())
+                .message("Updated status for multiple music successfully")
+                .result(updatedMusics)
+                .build();
+
         return ResponseEntity.ok(apiResponse);
     }
 

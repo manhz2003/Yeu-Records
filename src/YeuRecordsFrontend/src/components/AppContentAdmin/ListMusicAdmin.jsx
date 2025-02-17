@@ -338,6 +338,7 @@ const ListMusicAdmin = ({ listMusic }) => {
                 </div>
               )}
             </div>
+
             <div>
               <div
                 className="font-medium truncate md:max-w-[800px] max-w-[250px]"
@@ -346,6 +347,8 @@ const ListMusicAdmin = ({ listMusic }) => {
                 {item?.musicName}
               </div>
             </div>
+
+            <div className="ml-[30px]">[{item?.statusMusic}]</div>
           </div>
         ))}
       </div>

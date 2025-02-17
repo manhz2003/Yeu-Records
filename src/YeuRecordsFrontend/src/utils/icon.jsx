@@ -82,6 +82,7 @@ import { BsCloudDownload } from "react-icons/bs";
 import { CiCircleList } from "react-icons/ci";
 import { MdPayments } from "react-icons/md";
 import { CiCirclePlus } from "react-icons/ci";
+import { TbStatusChange } from "react-icons/tb";
 
 const icons = {
   MdPayments,
@@ -168,6 +169,7 @@ const icons = {
   GrPrevious,
   FiUserPlus,
   CiCircleList,
+  TbStatusChange,
 };
 
 export default icons;
