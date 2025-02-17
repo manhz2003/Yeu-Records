@@ -27,6 +27,10 @@ public class Music {
     Category category;
 
     @ManyToOne
+    @JoinColumn(name = "status_music_id", nullable = false)
+    StatusMusic statusMusic;
+
+    @ManyToOne
     @JoinColumn(name = "album_id")
     Album album;
 

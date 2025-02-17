@@ -1,13 +1,17 @@
 package org.manhdev.testcrudspringboot.configuration;
 
 import java.util.HashSet;
+import java.util.List;
 
 import org.manhdev.testcrudspringboot.constant.PredefinedRole;
 import org.manhdev.testcrudspringboot.model.Role;
+import org.manhdev.testcrudspringboot.model.StatusMusic;
 import org.manhdev.testcrudspringboot.model.User;
 import org.manhdev.testcrudspringboot.repository.RoleRepository;
+import org.manhdev.testcrudspringboot.repository.StatusMusicRepository;
 import org.manhdev.testcrudspringboot.repository.UserRepository;
 import org.manhdev.testcrudspringboot.service.DigitalSignatureService;  // import service tạo chữ ký số
+import org.manhdev.testcrudspringboot.service.StatusMusicService;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ApplicationInitConfig {
     PasswordEncoder passwordEncoder;
     DigitalSignatureService digitalSignatureService;
+    StatusMusicRepository statusMusicRepository;
 
     @NonFinal
     static final String ADMIN_USER_NAME = "azusa.producer@gmail.com";
@@ -78,6 +83,17 @@ public class ApplicationInitConfig {
                         .description("Đây là quyền của nhân viên")
                         .build());
                 log.info("Tạo role STAFF thành công: {}", staffRole);
+            }
+
+            // Kiểm tra và tạo các trạng thái StatusMusic
+            List<String> predefinedStatuses = List.of("Chờ kiểm duyệt", "Đang kiểm duyệt", "Đã kiểm duyệt", "Đã xuất bản");
+            for (String statusName : predefinedStatuses) {
+                if (statusMusicRepository.findByNameStatus(statusName).isEmpty()) {
+                    StatusMusic status = statusMusicRepository.save(StatusMusic.builder()
+                            .nameStatus(statusName)
+                            .build());
+                    log.info("Tạo trạng thái StatusMusic: {}", status.getNameStatus());
+                }
             }
 
             log.info("Đã hoàn tất khởi tạo ứng dụng .....");

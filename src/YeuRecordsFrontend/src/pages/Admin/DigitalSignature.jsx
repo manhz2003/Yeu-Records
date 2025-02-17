@@ -4,76 +4,9 @@ import { apiVerifySignature } from "../../apis";
 import CryptoJS from "crypto-js";
 
 const DigitalSignature = () => {
-  const [email, setEmail] = useState("");
-  const [digitalSignature, setDigitalSignature] = useState("");
   const [file, setFile] = useState(null);
   const [musicInfo, setMusicInfo] = useState(null);
 
-  const [publicKey, setPublicKey] = useState("");
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!email || !digitalSignature || !publicKey) {
-      Swal.fire({
-        icon: "error",
-        title: "error!",
-        text: "Please fill in all information!",
-      });
-      return;
-    }
-
-    const requestData = {
-      digitalSignature,
-      publicKey,
-      user: { email },
-    };
-
-    try {
-      const response = await apiVerifySignature(requestData);
-      if (response.status === 200) {
-        Swal.fire({
-          icon: "success",
-          title: "success!",
-          text: "Digital signature has been successfully authenticated!",
-        });
-
-        Swal.fire({
-          icon: "info",
-          title: "User information",
-          html: `
-            <p><strong>Verify Signature:</strong> ${response?.data.result.signatureValid}</p>
-          `,
-        });
-
-        setEmail("");
-        setDigitalSignature("");
-        setPublicKey("");
-      } else if (response.status === 400) {
-        Swal.fire({
-          icon: "error",
-          title: "error!",
-          text: response.data.error,
-        });
-      }
-    } catch (error) {
-      if (error.status === 400) {
-        Swal.fire({
-          icon: "error",
-          title: "error!",
-          text: error?.response.data.message,
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "error!",
-          text: "Unable to connect to server. Please try again later.",
-        });
-      }
-    }
-  };
-
-  // Giải mã dữ liệu chữ ký với khóa bí mật
   const decryptSignature = (encryptedData, secretKey) => {
     const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
     return bytes.toString(CryptoJS.enc.Utf8);
