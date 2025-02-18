@@ -3,6 +3,7 @@ package org.manhdev.testcrudspringboot.repository;
 import jakarta.transaction.Transactional;
 import org.manhdev.testcrudspringboot.model.Category;
 import org.manhdev.testcrudspringboot.model.Music;
+import org.manhdev.testcrudspringboot.model.StatusMusic;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -44,4 +45,7 @@ public interface MusicRepository extends JpaRepository<Music, String> {
     @Transactional
     long deleteByLicensesIsNull();
 
+    Page<Music> findByStatusMusic(StatusMusic statusMusic, Pageable pageable);
+
+    Page<Music> findByCategoryAndStatusMusic(Category category, StatusMusic statusMusic, Pageable pageable);
 }

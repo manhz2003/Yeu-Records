@@ -54,7 +54,7 @@ const ManageMusic = () => {
   }, []);
 
   const handleDownload = (row) => {
-    const fileUrl = row?.musicUrl; // Lấy URL từ dữ liệu hàng
+    const fileUrl = row?.musicUrl;
 
     if (fileUrl) {
       // Tạo một liên kết tạm thời
@@ -220,9 +220,21 @@ const ManageMusic = () => {
     setCurrentPage(page);
   };
 
-  const filteredMusic = dataMusic?.musics.filter((music) =>
-    music.musicName.toLowerCase().includes(searchValue.toLowerCase())
-  );
+  const filteredMusic = dataMusic?.musics.filter((music) => {
+    const lowerCaseSearch = searchValue.trim().toLowerCase();
+
+    // Kiểm tra tìm kiếm theo tên bài hát hoặc tên tác giả
+    const matchesSearchValue =
+      music?.musicName?.toLowerCase().includes(lowerCaseSearch) ||
+      music?.fullName?.toLowerCase().includes(lowerCaseSearch);
+
+    // Kiểm tra tìm kiếm theo trạng thái nhạc (statusMusic)
+    const matchesStatus = music?.statusMusic
+      ?.toLowerCase()
+      .includes(lowerCaseSearch);
+
+    return matchesSearchValue || matchesStatus;
+  });
 
   const handleCheckboxChange = (id, isChecked) => {
     if (id === "all") {
@@ -364,9 +376,11 @@ const ManageMusic = () => {
                   <input
                     type="radio"
                     name="statusMusic"
-                    value={status?.id} // Lưu trữ ID thay vì name
-                    checked={selectedStatus === status.id} // Kiểm tra ID thay vì name
-                    onChange={() => handleStatusChange(status.id)} // Gửi ID khi thay đổi
+                    value={status?.id}
+                    checked={selectedStatus === status.id}
+                    onChange={() => {
+                      handleStatusChange(status.id);
+                    }}
                     className="hidden"
                   />
                   <span
@@ -390,15 +404,15 @@ const ManageMusic = () => {
               Data Artist
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex items-center relative transition-all duration-500 ease-in-out w-[212px] sm:w-[240px]">
+              <div className="flex items-center relative transition-all duration-500 ease-in-out w-[300px] sm:w-[490px]">
                 <div className="flex items-center justify-center absolute left-0 top-0 h-full p-2 rounded-[50%]">
                   <IoSearch size="18px" />
                 </div>
                 <input
                   type="text"
-                  placeholder="Search data ..."
+                  placeholder="Search with artist or status or music"
                   value={searchValue}
-                  onChange={(e) => setSearchValue(e.target.value)}
+                  onChange={(e) => setSearchValue(e.target.value)} // Update searchValue
                   className="pl-8 p-2 rounded-md border border-[#ccc] focus:outline-none transition-all duration-500 ease-in-out w-full opacity-100"
                   style={{
                     fontWeight: "300",
