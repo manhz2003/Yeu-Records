@@ -46,3 +46,10 @@ export const apiUpdateStatusMusic = (data) =>
     data,
     method: "put",
   });
+
+export const apiUpdatePlatformMusic = (id, data) =>
+  instance({
+    url: `music/${id}/update-platform`,
+    data,
+    method: "put",
+  });

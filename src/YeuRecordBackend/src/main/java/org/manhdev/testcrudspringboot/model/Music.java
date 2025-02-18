@@ -46,6 +46,9 @@ public class Music {
     @Column(columnDefinition = "TEXT")
     String thumbnailUrl;
 
+    @Column(columnDefinition = "TEXT")
+    String platformReleased;
+
     @Temporal(TemporalType.TIMESTAMP)
     Date createdAt;
 

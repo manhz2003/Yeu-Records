@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.manhdev.testcrudspringboot.constant.MessageConstant;
 import org.manhdev.testcrudspringboot.dto.request.MusicRequest;
 import org.manhdev.testcrudspringboot.dto.request.UpdateMusicStatusRequest;
+import org.manhdev.testcrudspringboot.dto.request.UpdatePlatformRequest;
 import org.manhdev.testcrudspringboot.dto.response.MusicResponse;
 import org.manhdev.testcrudspringboot.dto.response.StatisticsMusicResponse;
 import org.manhdev.testcrudspringboot.exception.ResourceNotFoundException;
@@ -210,6 +211,18 @@ public class MusicService {
 
         return musicList.stream().map(musicMapper::toResponse).toList();
     }
+
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    public MusicResponse updatePlatformReleased(String musicId, UpdatePlatformRequest request) {
+        Music music = musicRepository.findById(musicId)
+                .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MUSIC_NOT_FOUND));
+
+        music.setPlatformReleased(request.getPlatformReleased());
+        Music updatedMusic = musicRepository.save(music);
+
+        return musicMapper.toResponse(updatedMusic);
+    }
+
 
 
 }

@@ -19,6 +19,7 @@ public class MusicResponse {
     String musicUrl;
     String thumbnailUrl;
     String statusMusic;
+    String platformReleased;
     String createdAt;
     String updatedAt;
 }

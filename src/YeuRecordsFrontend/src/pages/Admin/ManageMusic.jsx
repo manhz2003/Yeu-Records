@@ -9,9 +9,13 @@ import {
   apiGetAllCategory,
   apiGetAllStatusMusic,
   apiUpdateStatusMusic,
+  apiUpdatePlatformMusic,
 } from "../../apis";
 import { toast } from "react-toastify";
 import { data } from "autoprefixer";
+
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 const {
   IoSearch,
@@ -23,6 +27,8 @@ const {
   CiSquareQuestion,
   BsCloudDownload,
   TbStatusChange,
+  FiEdit,
+  IoIosClose,
 } = icons;
 
 const ManageMusic = () => {
@@ -37,6 +43,8 @@ const ManageMusic = () => {
   const [statusMusic, setStatusMusic] = useState();
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedRows, setSelectedRows] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedMusic, setSelectedMusic] = useState();
 
   const fetchDataCategory = async () => {
     try {
@@ -206,6 +214,7 @@ const ManageMusic = () => {
     { label: "Album Name", accessor: "album_name" },
     { label: "collab", accessor: "description" },
     { label: "Status Music", accessor: "statusMusic" },
+    { label: "Platform Released", accessor: "platformReleased" },
     { label: "Created At", accessor: "createdAt" },
     { label: "Updated At", accessor: "updatedAt" },
   ];
@@ -291,6 +300,42 @@ const ManageMusic = () => {
       console.log(error);
     }
   };
+
+  const handleEdit = (row) => {
+    setIsModalOpen(true);
+    setSelectedMusic(row);
+  };
+
+  console.log(selectedMusic);
+
+  const formik = useFormik({
+    initialValues: {
+      platformReleased: selectedMusic?.platformReleased || "",
+    },
+    enableReinitialize: true,
+    onSubmit: async (values) => {
+      try {
+        if (selectedMusic) {
+          await apiUpdatePlatformMusic(selectedMusic?.id, {
+            platformReleased: values?.platformReleased,
+          });
+
+          toast.success("Platform released updated successfully!");
+          fetchDataMusic();
+        }
+
+        // Clear form
+        formik.resetForm();
+        setIsModalOpen(false);
+      } catch (error) {
+        if (error.response?.status === 409) {
+          toast.error(error.response.data.message);
+        } else {
+          console.log("An unexpected error occurred. Please try again.");
+        }
+      }
+    },
+  });
 
   return (
     <>
@@ -442,8 +487,13 @@ const ManageMusic = () => {
             selectedRows={selectedRows}
             setSelectedRows={setSelectedRows}
             onCheckboxChange={handleCheckboxChange}
+            onEdit={handleEdit}
             enableCheckbox={true}
-            actionIcons={{ delete: <FiTrash />, download: <BsCloudDownload /> }}
+            actionIcons={{
+              edit: <FiEdit />,
+              delete: <FiTrash />,
+              download: <BsCloudDownload />,
+            }}
           />
         </div>
 
@@ -452,6 +502,65 @@ const ManageMusic = () => {
             <ListMusicAdmin listMusic={listMusic} />
           </div>
         </div>
+
+        {isModalOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white rounded-[6px] shadow-lg p-6 w-[400px] relative">
+              <button
+                className="absolute top-3 right-3 text-gray-500 hover:text-black"
+                onClick={() => setIsModalOpen(false)}
+              >
+                <IoIosClose size="26px" />
+              </button>
+              <h2 className="text-left text-lg font-semibold mb-4">
+                Update Platform Released
+              </h2>
+              <form onSubmit={formik.handleSubmit}>
+                <div className="mb-4">
+                  <label className="block font-medium text-gray-700 mb-1">
+                    Platform Released
+                  </label>
+                  <input
+                    type="text"
+                    name="platformReleased"
+                    value={formik.values.platformReleased}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className={`w-full px-3 py-2 border rounded-[6px] ${
+                      formik.touched.nameCategory &&
+                      formik.errors.platformReleased
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                    placeholder="Enter category name"
+                  />
+                  {formik.touched.platformReleased &&
+                    formik.errors.platformReleased && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {formik.errors.platformReleased}
+                      </p>
+                    )}
+                </div>
+
+                <div className="flex justify-between mt-4">
+                  <button
+                    type="button"
+                    className="bg-gray-500 text-white px-4 py-2 rounded-[8px] hover:bg-gray-600"
+                    onClick={() => setIsModalOpen(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-[#000] text-white rounded-[6px]"
+                  >
+                    Confirm
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

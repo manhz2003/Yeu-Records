@@ -9,6 +9,7 @@ import org.manhdev.testcrudspringboot.constant.PaginationConstants;
 import org.manhdev.testcrudspringboot.dto.request.ApiResponse;
 import org.manhdev.testcrudspringboot.dto.request.MusicRequest;
 import org.manhdev.testcrudspringboot.dto.request.UpdateMusicStatusRequest;
+import org.manhdev.testcrudspringboot.dto.request.UpdatePlatformRequest;
 import org.manhdev.testcrudspringboot.dto.response.MusicResponse;
 import org.manhdev.testcrudspringboot.dto.response.StatisticsMusicResponse;
 import org.manhdev.testcrudspringboot.service.MusicService;
@@ -109,6 +110,21 @@ public class MusicController {
                 .code(HttpStatus.OK.value())
                 .message("Updated status for multiple music successfully")
                 .result(updatedMusics)
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @PutMapping("/{musicId}/update-platform")
+    public ResponseEntity<ApiResponse<MusicResponse>> updatePlatformReleased(
+            @PathVariable String musicId,
+            @RequestBody @Valid UpdatePlatformRequest request) {
+
+        MusicResponse updatedMusic = musicService.updatePlatformReleased(musicId, request);
+        ApiResponse<MusicResponse> apiResponse = ApiResponse.<MusicResponse>builder()
+                .code(HttpStatus.OK.value())
+                .message("Updated platformReleased successfully")
+                .result(updatedMusic)
                 .build();
 
         return ResponseEntity.ok(apiResponse);

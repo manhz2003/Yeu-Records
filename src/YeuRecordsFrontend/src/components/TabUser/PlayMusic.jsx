@@ -17,6 +17,7 @@ const {
   FaVolumeDown,
   IoMdPlay,
   RiShareForwardFill,
+  GiFlatPlatform,
 } = icons;
 
 import {
@@ -45,6 +46,8 @@ const PlayMusic = React.memo(({ receivedDataAlbum, receivedDataAlbumId }) => {
   const [currentSong, setCurrentSong] = useState(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [isModalPlatformOpen, setIsModalPlatformOpen] = useState(false);
+  const [platformReleased, setPlatformReleased] = useState();
 
   const fetchDataMusic = async () => {
     try {
@@ -60,8 +63,6 @@ const PlayMusic = React.memo(({ receivedDataAlbum, receivedDataAlbumId }) => {
       console.error("Error fetching music data:", error);
     }
   };
-
-  console.log(listMusic);
 
   // chuyển từ fake data sang data thật
   useEffect(() => {
@@ -407,15 +408,28 @@ const PlayMusic = React.memo(({ receivedDataAlbum, receivedDataAlbumId }) => {
                   <div className="ml-[30px]">[{item?.statusMusic}]</div>
 
                   {hoveredIndex === index && (
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsModalOpen(true);
-                        setMusicId(item?.id);
-                      }}
-                      className="absolute right-2 cursor-pointer"
-                    >
-                      <RiShareForwardFill size="18px" />
+                    <div className="flex items-center">
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsModalOpen(true);
+                          setMusicId(item?.id);
+                        }}
+                        className="absolute right-2 cursor-pointer"
+                      >
+                        <RiShareForwardFill size="18px" />
+                      </div>
+
+                      <div
+                        onClick={(e) => {
+                          setPlatformReleased(item?.platformReleased);
+                          e.stopPropagation();
+                          setIsModalPlatformOpen(true);
+                        }}
+                        className="absolute right-10 cursor-pointer"
+                      >
+                        <GiFlatPlatform size="18px" />
+                      </div>
                     </div>
                   )}
                 </div>
@@ -475,6 +489,25 @@ const PlayMusic = React.memo(({ receivedDataAlbum, receivedDataAlbumId }) => {
                       Confirm
                     </button>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Modal platform */}
+            {isModalPlatformOpen && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg p-5 w-[400px] md:w-[600px] max-h-[80vh] overflow-y-auto relative">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xl font-semibold">
+                      List of released digital music platforms
+                    </h3>
+
+                    <button onClick={() => setIsModalPlatformOpen(false)}>
+                      <IoIosClose size="24px" />
+                    </button>
+                  </div>
+
+                  <div className=" leading-8 p-2">{platformReleased}</div>
                 </div>
               </div>
             )}

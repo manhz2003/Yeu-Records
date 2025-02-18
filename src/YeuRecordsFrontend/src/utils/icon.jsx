@@ -83,8 +83,10 @@ import { CiCircleList } from "react-icons/ci";
 import { MdPayments } from "react-icons/md";
 import { CiCirclePlus } from "react-icons/ci";
 import { TbStatusChange } from "react-icons/tb";
+import { GiFlatPlatform } from "react-icons/gi";
 
 const icons = {
+  GiFlatPlatform,
   MdPayments,
   BsCloudDownload,
   CiSquareQuestion,
