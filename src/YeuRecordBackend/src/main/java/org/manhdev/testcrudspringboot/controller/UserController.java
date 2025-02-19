@@ -115,4 +115,10 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @PatchMapping("/{userId}/amount")
+    public ResponseEntity<UserResponse> updateAmountPayable(
+            @PathVariable String userId,
+            @RequestBody UpdateAmountRequest request) {
+        return ResponseEntity.ok(userService.updateAmountPayable(userId, request));
+    }
 }

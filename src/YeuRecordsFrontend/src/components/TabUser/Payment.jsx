@@ -237,13 +237,6 @@ const Payment = () => {
                       {paymentInfo.paypalInfo}
                     </span>
                   </p>
-
-                  <p>
-                    <strong>Payment status:</strong>{" "}
-                    <span className="underline italic">
-                      {paymentInfo.paymentStatus ? "Pending" : "Paid"}
-                    </span>
-                  </p>
                 </>
               ) : (
                 <p>No payment information yet...</p>

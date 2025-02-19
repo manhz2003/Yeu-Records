@@ -28,9 +28,6 @@ public class PaymentInfo {
     String accountNumber;
     String paypalInfo;
 
-    @Builder.Default
-    Boolean paymentStatus = false;
-
     @Temporal(TemporalType.TIMESTAMP)
     Date createdAt;
 

@@ -15,10 +15,3 @@ export const apiGetPaymentInfoById = (id) =>
     url: `/payment-info/${id}`,
     method: "get",
   });
-
-export const apiUpdatePaymentStatus = (ids) =>
-  instance({
-    url: `/payment-info/update-status`,
-    method: "PATCH",
-    data: ids,
-  });

@@ -5,11 +5,11 @@ import { Table } from "../../components/index";
 import { toast } from "react-toastify";
 
 import {
-  apiUpdatePaymentStatus,
   apiGetDataManagerArtist,
   apiDeleteUser,
   apiGrantRoles,
   apiLockOrUnLock,
+  apiUpdateAmount,
 } from "../../apis";
 
 import { apiGetAllRole } from "../../apis/role";
@@ -32,6 +32,8 @@ const {
 
 const ManageArtists = () => {
   const [searchValue, setSearchValue] = useState("");
+  const [amountPaid, setAmountPaid] = useState("");
+  const [amountPayable, setAmountPayable] = useState("");
   const [dataManagerArtist, setDataManagerArtist] = useState({});
   const [selectedRows, setSelectedRows] = useState([]);
   const [pageSize, setPageSize] = useState(10);
@@ -138,11 +140,12 @@ const ManageArtists = () => {
     { accessor: "roles", label: "Roles" },
     { accessor: "fullname", label: "Full Name" },
     { accessor: "email", label: "Email" },
+    { accessor: "paypalInfo", label: "Paypal" },
     { accessor: "accountName", label: "Account Name" },
     { accessor: "accountNumber", label: "Account Number" },
     { accessor: "bankCode", label: "Bank Code" },
     { accessor: "bankName", label: "Bank Name" },
-    { accessor: "paymentStatus", label: "Payment Status " },
+    { accessor: "amountPayable", label: "Amount Payable" },
     { accessor: "status", label: "Status" },
     { accessor: "statusOnline", label: "Online" },
     { accessor: "lockout", label: "Lockout" },
@@ -178,12 +181,6 @@ const ManageArtists = () => {
     accountName: user.paymentInfos?.[0]?.accountName || "",
     accountNumber: user.paymentInfos?.[0]?.accountNumber || "",
     paypalInfo: user.paymentInfos?.[0]?.paypalInfo || "",
-    paymentStatus:
-      user.paymentInfos?.[0]?.paymentStatus === "false"
-        ? "Pending"
-        : user.paymentInfos?.[0]?.paymentStatus === "true"
-        ? "Paid"
-        : "",
   }));
 
   // Lọc dữ liệu theo fullname
@@ -296,22 +293,70 @@ const ManageArtists = () => {
     handleLockOrUnlock(2);
   };
 
-  // trạng thái thanh toán
-  const handlePaymentStatus = async () => {
+  // thanh toán số tiền
+  const handleInputChange = (e, type) => {
+    const value = e.target.value;
+
+    // Chỉ cho phép nhập số dương (bao gồm cả số thập phân)
+    const isValid = /^(\d+(\.\d*)?)?$/.test(value);
+    if (!isValid) return; // Không cập nhật nếu nhập sai định dạng số
+
+    if (type === "payable") {
+      setAmountPayable(value);
+      setAmountPaid(""); // Xóa giá trị ô còn lại
+    } else {
+      setAmountPaid(value);
+      setAmountPayable(""); // Xóa giá trị ô còn lại
+    }
+  };
+
+  const handlePaymentAmount = async () => {
     if (selectedRows.length === 0) {
       toast.error("Please select a user.");
       return;
     }
 
+    if (selectedRows.length > 1) {
+      toast.error("Please select only one user at a time.");
+      return;
+    }
+
+    // Kiểm tra chỉ được nhập 1 trong 2 ô
+    if (!amountPaid && !amountPayable) {
+      toast.error("Please enter an amount.");
+      return;
+    }
+    if (amountPaid && amountPayable) {
+      toast.error(
+        "Please enter only one value (either Amount Paid or Amount Payable)."
+      );
+      return;
+    }
+
     try {
-      const response = await apiUpdatePaymentStatus(selectedRows);
+      console.log("User:", selectedRows[0]);
+      console.log("Amount Paid:", amountPaid);
+      console.log("Amount Payable:", amountPayable);
+
+      // Gửi request với dữ liệu nhập từ form
+      const response = await apiUpdateAmount(selectedRows[0], {
+        amountPaid: amountPaid ? parseFloat(amountPaid) : null,
+        amountPayable: amountPayable ? parseFloat(amountPayable) : null,
+      });
+
       if (response.status === 200) {
-        console.log(response);
-        toast.success("payment status update successful!");
+        toast.success("Payment update successful!");
+        setAmountPaid("");
+        setAmountPayable("");
         fetchDataManagerArtist();
       }
     } catch (error) {
-      toast("Artist has not filled out their account information");
+      console.log(error);
+      if (error.response?.data?.code === 422) {
+        toast.error("Artist has not filled out their account information.");
+      } else {
+        toast.error("An error occurred while updating payment.");
+      }
       console.log(error);
     }
   };
@@ -369,6 +414,13 @@ const ManageArtists = () => {
           <div className="flex flex-wrap items-center gap-3">
             <div
               className="flex items-center gap-2 p-3 bg-[#000] text-[#fff] rounded-[6px] cursor-pointer sm:w-auto w-full"
+              onClick={handleUnLocked}
+            >
+              <CiUnlock />
+              <div>Unlocked</div>
+            </div>
+            <div
+              className="flex items-center gap-2 p-3 bg-[#000] text-[#fff] rounded-[6px] cursor-pointer sm:w-auto w-full"
               onClick={handleLocked}
             >
               <CiLock />
@@ -377,26 +429,10 @@ const ManageArtists = () => {
 
             <div
               className="flex items-center gap-2 p-3 bg-[#000] text-[#fff] rounded-[6px] cursor-pointer sm:w-auto w-full"
-              onClick={handleUnLocked}
-            >
-              <CiUnlock />
-              <div>Unlocked</div>
-            </div>
-
-            <div
-              className="flex items-center gap-2 p-3 bg-[#000] text-[#fff] rounded-[6px] cursor-pointer sm:w-auto w-full"
               onClick={handleExport}
             >
               <CiExport />
               <div>Export</div>
-            </div>
-
-            <div
-              className="flex items-center gap-2 p-3 bg-[#000] text-[#fff] rounded-[6px] cursor-pointer sm:w-auto w-full"
-              onClick={handlePaymentStatus}
-            >
-              <MdPayments />
-              <div>Payment status</div>
             </div>
 
             <div
@@ -420,6 +456,7 @@ const ManageArtists = () => {
                     onChange={(e) =>
                       handleRoleCheckboxChange(e.target.value, e.target.checked)
                     }
+                    disabled={role.name === "ADMIN"} // Vô hiệu hóa nếu là ADMIN
                     className="hidden"
                   />
                   <span
@@ -427,11 +464,33 @@ const ManageArtists = () => {
                       selectedRole.includes(role.name)
                         ? "bg-blue-500 border-blue-500 text-white"
                         : "border-gray-400"
+                    } ${
+                      role.name === "ADMIN"
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
                     }`}
+                    title={
+                      role.name === "ADMIN"
+                        ? "This role cannot be selected"
+                        : ""
+                    }
                   >
                     {selectedRole.includes(role.name) && "✓"}
                   </span>
-                  <span>{role.name}</span>
+                  <span
+                    className={
+                      role.name === "ADMIN"
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
+                    }
+                    title={
+                      role.name === "ADMIN"
+                        ? "This role cannot be selected"
+                        : ""
+                    }
+                  >
+                    {role.name}
+                  </span>
                 </label>
               ))}
             </div>
@@ -452,7 +511,7 @@ const ManageArtists = () => {
             <select
               value={filterRole}
               onChange={handleRoleFilterChange}
-              className="bg-[#f3f1f1] py-[11px] px-4 rounded-md outline-none md:w-[175px] w-full"
+              className="bg-[#f3f1f1] py-[11px] px-4 rounded-md outline-none md:w-[165px] w-full"
             >
               <option value="" disabled>
                 Filter Role
@@ -463,6 +522,36 @@ const ManageArtists = () => {
                 </option>
               ))}
             </select>
+
+            <div
+              className="flex items-center gap-2 p-3 bg-[#000] text-[#fff] rounded-[6px] cursor-pointer sm:w-auto w-full"
+              onClick={handlePaymentAmount}
+            >
+              <MdPayments />
+              <div>Payment</div>
+            </div>
+
+            <div className="w-[503px]">
+              <input
+                type="text"
+                placeholder="Enter the amount to pay"
+                value={amountPayable}
+                onChange={(e) => handleInputChange(e, "payable")}
+                className="pl-6 p-2 rounded-md border border-[#ccc] focus:outline-none transition-all duration-500 ease-in-out w-full py-[12px] opacity-100"
+                style={{ fontWeight: "300", fontSize: "14px" }}
+              />
+            </div>
+
+            <div className="w-[503px]">
+              <input
+                type="text"
+                placeholder="Enter the amount paid"
+                value={amountPaid}
+                onChange={(e) => handleInputChange(e, "paid")}
+                className="pl-6 p-2 rounded-md border border-[#ccc] focus:outline-none transition-all duration-500 ease-in-out w-full py-[12px] opacity-100"
+                style={{ fontWeight: "300", fontSize: "14px" }}
+              />
+            </div>
           </div>
         </div>
         <div className="w-full flex flex-col gap-4 shadow p-4 rounded-[6px] bg-[#fff]">
@@ -477,7 +566,7 @@ const ManageArtists = () => {
                 </div>
                 <input
                   type="text"
-                  placeholder="Search data ..."
+                  placeholder="Search data by name artist ..."
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
                   className="pl-8 p-2 rounded-md border border-[#ccc] focus:outline-none transition-all duration-500 ease-in-out w-full opacity-100"

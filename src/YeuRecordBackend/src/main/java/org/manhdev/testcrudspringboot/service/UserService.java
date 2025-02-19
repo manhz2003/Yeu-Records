@@ -331,5 +331,28 @@ public class UserService {
         return actionMessage;
     }
 
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    public UserResponse updateAmountPayable(String userId, UpdateAmountRequest request) {
+        // Lấy user từ DB
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.USER_NOT_FOUND));
+
+        // Kiểm tra xem user có tài khoản thanh toán không
+        if (user.getPaymentInfos() == null || user.getPaymentInfos().isEmpty()) {
+            throw new AppException(ErrorCode.NO_PAYMENT_ACCOUNT);
+        }
+
+        // Kiểm tra và cập nhật giá trị amountPayable
+        if (request.getAmountPayable() != null) {
+            user.setAmountPayable(user.getAmountPayable() + request.getAmountPayable());
+        } else if (request.getAmountPaid() != null) {
+            user.setAmountPayable(user.getAmountPayable() - request.getAmountPaid());
+        }
+
+        // Lưu vào DB
+        userRepository.save(user);
+        return userMapper.toUserResponse(user);
+    }
 
 }

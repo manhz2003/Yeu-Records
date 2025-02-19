@@ -39,10 +39,17 @@ const Table = ({
 
   const handleCheckboxChange = (id, isChecked) => {
     if (id === "all") {
-      if (isChecked) {
-        setSelectedRows(data.map((row) => row.id));
-      } else {
+      const selectableRows = data.filter(
+        (row) => !row?.roles?.includes("ADMIN")
+      );
+      const selectableIds = selectableRows.map((row) => row.id);
+
+      if (selectedRows.length === selectableIds.length) {
+        // Nếu tất cả đã được chọn, bỏ chọn tất cả
         setSelectedRows([]);
+      } else {
+        // Nếu chưa chọn hết, chọn tất cả các bản ghi hợp lệ
+        setSelectedRows(selectableIds);
       }
     } else {
       setSelectedRows((prev) =>

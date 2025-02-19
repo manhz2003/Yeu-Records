@@ -33,7 +33,8 @@ public class UserResponse {
     boolean statusOnline;
     boolean lockout;
     boolean activeEmail;
-    private int totalMusic;
+    int totalMusic;
+    double amountPayable;
     Date createdAt;
     Date updatedAt;
 

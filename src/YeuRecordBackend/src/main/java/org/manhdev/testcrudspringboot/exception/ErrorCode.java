@@ -30,6 +30,7 @@ public enum ErrorCode {
     UNAUTHENTICATED(401, "token không hợp lệ", HttpStatus.UNAUTHORIZED),
     ENDPOINT_NOT_FOUND(404, "endpoint không hợp lệ", HttpStatus.NOT_FOUND),
     UNAUTHORIZED(403, "user không có quyền truy cập", HttpStatus.FORBIDDEN),
+    NO_PAYMENT_ACCOUNT(422, "Người dùng chưa có tài khoản thanh toán", HttpStatus.UNPROCESSABLE_ENTITY),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

@@ -54,3 +54,10 @@ export const apiLockOrUnLock = (data) =>
     data,
     method: "put",
   });
+
+export const apiUpdateAmount = (id, data) =>
+  instance({
+    url: `/users/${id}/amount`,
+    data,
+    method: "patch",
+  });

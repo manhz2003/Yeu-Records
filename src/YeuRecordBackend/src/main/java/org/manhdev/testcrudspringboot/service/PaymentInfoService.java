@@ -15,12 +15,8 @@ import org.manhdev.testcrudspringboot.model.User;
 import org.manhdev.testcrudspringboot.repository.PaymentInfoRepository;
 import org.manhdev.testcrudspringboot.repository.UserRepository;
 import org.manhdev.testcrudspringboot.util.UserAccessUtils;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -128,47 +124,4 @@ public class PaymentInfoService {
         return paymentInfoMapper.toResponse(paymentInfo);
     }
 
-
-    /**
-     * Cập nhật trạng thái thanh toán cho 1 hoặc nhiều userId.
-     * Nếu trạng thái thanh toán cần chuyển thành true trong tháng hiện tại hoặc false nếu đã sang tháng mới.
-     *
-     * @param userIds Danh sách các userId cần cập nhật trạng thái thanh toán
-     */
-
-    @PreAuthorize("hasRole('ADMIN')")
-    public void updatePaymentStatusForUsers(List<String> userIds) {
-        for (String userId : userIds) {
-            // Kiểm tra quyền truy cập của người dùng
-            UserAccessUtils.checkUserAccess(userId);
-
-            // Lấy thông tin thanh toán của người dùng
-            Optional<PaymentInfo> paymentInfoOptional = paymentInfoRepository.findByUserId(userId);
-
-            PaymentInfo paymentInfo = paymentInfoOptional
-                    .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.USER_NOT_FOUND + ".. " + userId));
-
-            // Cập nhật trạng thái thanh toán dựa trên thời gian
-            paymentInfo.setPaymentStatus(isSameMonth(paymentInfo.getCreatedAt()));
-
-            // Lưu lại thông tin thanh toán đã cập nhật
-            paymentInfoRepository.save(paymentInfo);
-        }
-    }
-
-    /**
-     * Kiểm tra xem ngày trong `createdAt` có thuộc tháng hiện tại hay không.
-     *
-     * @param createdAt Ngày tạo của thông tin thanh toán
-     * @return true nếu trong cùng tháng, false nếu không
-     */
-
-    private boolean isSameMonth(Date createdAt) {
-        // Chuyển đổi Date thành LocalDate
-        LocalDate createdAtLocalDate = createdAt.toInstant()
-                .atZone(java.time.ZoneId.systemDefault())
-                .toLocalDate();
-        LocalDate now = LocalDate.now();
-        return createdAtLocalDate.getMonth() == now.getMonth() && createdAtLocalDate.getYear() == now.getYear();
-    }
 }

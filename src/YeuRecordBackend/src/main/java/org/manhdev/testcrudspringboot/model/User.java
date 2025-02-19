@@ -55,6 +55,9 @@ public class User {
     @Column(columnDefinition = "TEXT")
     String token;
 
+    @Builder.Default
+    double amountPayable = 0;
+
     @Column(columnDefinition = "TEXT")
     String contactFacebook;
 

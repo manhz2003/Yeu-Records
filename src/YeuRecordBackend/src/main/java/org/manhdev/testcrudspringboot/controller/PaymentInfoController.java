@@ -11,8 +11,6 @@ import org.manhdev.testcrudspringboot.service.PaymentInfoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @Slf4j
 @RequestMapping("/payment-info")
@@ -39,15 +37,6 @@ public class PaymentInfoController {
                     .message("Payment info retrieved successfully")
                     .result(response)
                     .build());
-    }
-
-    @PatchMapping("/update-status")
-    public ResponseEntity<ApiResponse<Void>> updatePaymentStatusForUsers(@RequestBody List<String> userIds) {
-        paymentInfoService.updatePaymentStatusForUsers(userIds);
-        return ResponseEntity.ok(ApiResponse.<Void>builder()
-                .code(200)
-                .message("Payment status updated successfully")
-                .build());
     }
 
 }
