@@ -84,8 +84,14 @@ import { MdPayments } from "react-icons/md";
 import { CiCirclePlus } from "react-icons/ci";
 import { TbStatusChange } from "react-icons/tb";
 import { GiFlatPlatform } from "react-icons/gi";
+import { TbProgressAlert } from "react-icons/tb";
+import { TbProgressHelp } from "react-icons/tb";
+import { TbProgressCheck } from "react-icons/tb";
 
 const icons = {
+  TbProgressAlert,
+  TbProgressHelp,
+  TbProgressCheck,
   GiFlatPlatform,
   MdPayments,
   BsCloudDownload,

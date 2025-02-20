@@ -45,7 +45,7 @@ public interface MusicRepository extends JpaRepository<Music, String> {
     @Transactional
     long deleteByLicensesIsNull();
 
-    Page<Music> findByStatusMusic(StatusMusic statusMusic, Pageable pageable);
+    @Query("SELECT s.nameStatus, COUNT(m) FROM Music m JOIN m.statusMusic s GROUP BY s.nameStatus")
+    List<Object[]> countSongsByStatus();
 
-    Page<Music> findByCategoryAndStatusMusic(Category category, StatusMusic statusMusic, Pageable pageable);
 }

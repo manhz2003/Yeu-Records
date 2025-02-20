@@ -7,7 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.manhdev.testcrudspringboot.constant.MessageConstant;
 import org.manhdev.testcrudspringboot.dto.request.CreatePaymentInfoRequest;
 import org.manhdev.testcrudspringboot.dto.response.PaymentInfoResponse;
+import org.manhdev.testcrudspringboot.exception.AppException;
 import org.manhdev.testcrudspringboot.exception.ConflictException;
+import org.manhdev.testcrudspringboot.exception.ErrorCode;
 import org.manhdev.testcrudspringboot.exception.ResourceNotFoundException;
 import org.manhdev.testcrudspringboot.mapper.PaymentInfoMapper;
 import org.manhdev.testcrudspringboot.model.PaymentInfo;
@@ -119,9 +121,25 @@ public class PaymentInfoService {
     //    lấy thông tin tài khoản theo id user
     public PaymentInfoResponse getPaymentInfoByUserId(String userId) {
         UserAccessUtils.checkUserAccess(userId);
-        PaymentInfo paymentInfo = paymentInfoRepository.findByUserId(userId)
+
+        // Kiểm tra user có tồn tại không
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.USER_NOT_FOUND));
-        return paymentInfoMapper.toResponse(paymentInfo);
+
+        // Tìm payment info
+        Optional<PaymentInfo> optionalPaymentInfo = paymentInfoRepository.findByUserId(userId);
+
+        if (optionalPaymentInfo.isEmpty()) {
+            throw new AppException(ErrorCode.NO_PAYMENT_ACCOUNT);
+        }
+
+        PaymentInfoResponse response = paymentInfoMapper.toResponse(optionalPaymentInfo.get());
+
+        // Gán paypalAmount từ User vào response
+        response.setPaypalAmount(user.getAmountPayable());
+
+        return response;
     }
+
 
 }

@@ -29,6 +29,9 @@ const {
   TbStatusChange,
   FiEdit,
   IoIosClose,
+  TbProgressAlert,
+  TbProgressHelp,
+  TbProgressCheck,
 } = icons;
 
 const ManageMusic = () => {
@@ -337,6 +340,24 @@ const ManageMusic = () => {
     },
   });
 
+  const statusMapping = {
+    "Waiting for censorship": {
+      icon: <TbProgressAlert size="20px" />,
+      bgColor: "#dd4b39",
+      label: "Awaiting Censorship",
+    },
+    Censor: {
+      icon: <TbProgressHelp size="20px" />,
+      bgColor: "#f0d002",
+      label: "Censor",
+    },
+    Published: {
+      icon: <TbProgressCheck size="20px" />,
+      bgColor: "#04a559",
+      label: "Publish",
+    },
+  };
+
   return (
     <>
       <div className="p-4 flex flex-col gap-3 w-full">
@@ -345,6 +366,7 @@ const ManageMusic = () => {
             Statistical Music
           </div>
           <div className="md:flex md:gap-4 items-center gap-8 flex-wrap">
+            {/* Tổng số bài hát */}
             <div className="flex flex-col items-center gap-2 p-4 bg-[#6699CC] rounded-[6px] shadow md:w-[216px]">
               <div className="flex items-center gap-2">
                 <FaMusic />
@@ -353,7 +375,8 @@ const ManageMusic = () => {
               <div>{dataMusic?.totalMusic}</div>
             </div>
 
-            <div className="flex flex-col items-center gap-2 p-4 bg-[#8BC34A] rounded-[6px] shadow md:my-0 my-2 md:w-[216px]">
+            {/* Bài hát hôm nay */}
+            <div className="flex flex-col items-center gap-2 p-4 bg-[#8BC34A] rounded-[6px] shadow md:w-[216px]">
               <div className="flex items-center gap-2">
                 <IoIosToday />
                 <div>Released Today</div>
@@ -361,7 +384,8 @@ const ManageMusic = () => {
               <div>{dataMusic?.totalMusicToday}</div>
             </div>
 
-            <div className="flex flex-col items-center gap-2 p-4 bg-[#4DB6AC] rounded-[6px] shadow md:my-0 my-2 md:w-[216px]">
+            {/* Bài hát trong tuần */}
+            <div className="flex flex-col items-center gap-2 p-4 bg-[#4DB6AC] rounded-[6px] shadow md:w-[216px]">
               <div className="flex items-center gap-2">
                 <MdCalendarMonth />
                 <div>Released Week</div>
@@ -369,6 +393,7 @@ const ManageMusic = () => {
               <div>{dataMusic?.totalMusicThisWeek}</div>
             </div>
 
+            {/* Bài hát trong tháng */}
             <div className="flex flex-col items-center gap-2 p-4 bg-[#607D8B] rounded-[6px] shadow md:w-[216px]">
               <div className="flex items-center gap-2">
                 <GiCalendarHalfYear />
@@ -377,13 +402,33 @@ const ManageMusic = () => {
               <div>{dataMusic?.totalMusicThisMonth}</div>
             </div>
 
-            <div className="flex flex-col items-center gap-2 p-4 bg-[#E57373] rounded-[6px] shadow md:my-0 my-2 md:w-[216px]">
+            {/* Bài hát trong năm */}
+            <div className="flex flex-col items-center gap-2 p-4 bg-[#E57373] rounded-[6px] shadow md:w-[216px]">
               <div className="flex items-center gap-2">
-                <CiSquareQuestion />
+                <CiSquareQuestion size="20px" />
                 <div>Released Year</div>
               </div>
               <div>{dataMusic?.totalMusicThisYear}</div>
             </div>
+
+            {/* Hiển thị trạng thái bài hát động */}
+            {dataMusic?.totalMusicByStatus?.map((status) => {
+              const { icon, bgColor, label } =
+                statusMapping[status.statusName] || {};
+              return (
+                <div
+                  key={status.statusName}
+                  className="flex flex-col items-center gap-2 p-4 rounded-[6px] shadow md:w-[216px]"
+                  style={{ backgroundColor: bgColor }}
+                >
+                  <div className="flex items-center gap-2">
+                    {icon}
+                    <div>{label || status.statusName}</div>
+                  </div>
+                  <div>{status.totalCount}</div>
+                </div>
+              );
+            })}
           </div>
         </div>
 

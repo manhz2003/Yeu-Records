@@ -10,6 +10,7 @@ import org.manhdev.testcrudspringboot.dto.request.UpdateMusicStatusRequest;
 import org.manhdev.testcrudspringboot.dto.request.UpdatePlatformRequest;
 import org.manhdev.testcrudspringboot.dto.response.MusicResponse;
 import org.manhdev.testcrudspringboot.dto.response.StatisticsMusicResponse;
+import org.manhdev.testcrudspringboot.dto.response.StatusMusicCountResponse;
 import org.manhdev.testcrudspringboot.exception.ResourceNotFoundException;
 import org.manhdev.testcrudspringboot.mapper.MusicMapper;
 import org.manhdev.testcrudspringboot.model.*;
@@ -22,8 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.manhdev.testcrudspringboot.util.HandleStringCloudinary.getPublicIdFromUrl;
 
@@ -71,7 +71,7 @@ public class MusicService {
 
     // Lấy tất cả nhạc hoặc lấy theo danh mục id category và thống kê
     public StatisticsMusicResponse getAllMusicWithStatistics(String categoryId, Pageable pageable) {
-        // Tính toán thống kê tổng số lượng nhạc
+        // Tính tổng số lượng nhạc
         int totalMusic = (int) musicRepository.count();
 
         // Tính toán thống kê từ repository
@@ -95,7 +95,28 @@ public class MusicService {
                 .mapToInt(result -> ((Number) result[1]).intValue())
                 .sum();
 
-        // Kiểm tra categoryId và lấy dữ liệu nhạc tương ứng
+        // Lấy danh sách tổng số bài hát theo trạng thái
+        List<Object[]> statusMusicCounts = musicRepository.countSongsByStatus();
+        Map<String, Integer> statusCountMap = new HashMap<>();
+
+        // Lưu vào map (key: statusName, value: totalCount)
+        for (Object[] result : statusMusicCounts) {
+            statusCountMap.put((String) result[0], ((Number) result[1]).intValue());
+        }
+
+        // Lấy tất cả trạng thái từ database
+        List<StatusMusic> allStatuses = statusMusicRepository.findAll();
+        List<StatusMusicCountResponse> totalMusicByStatus = new ArrayList<>();
+
+        // Đảm bảo tất cả trạng thái đều có mặt, nếu không có bài thì count = 0
+        for (StatusMusic status : allStatuses) {
+            totalMusicByStatus.add(new StatusMusicCountResponse(
+                    status.getNameStatus(),
+                    statusCountMap.getOrDefault(status.getNameStatus(), 0) // Mặc định là 0 nếu không có bài
+            ));
+        }
+
+        // Kiểm tra categoryId và lấy danh sách nhạc tương ứng
         Page<Music> musicPage;
         if (categoryId == null || categoryId.isEmpty()) {
             musicPage = musicRepository.findAll(pageable);
@@ -105,7 +126,7 @@ public class MusicService {
             musicPage = musicRepository.findByCategory(category, pageable);
         }
 
-        // Tạo response
+        // Tạo danh sách nhạc response
         List<MusicResponse> musics = musicPage.stream()
                 .map(musicMapper::toResponse)
                 .toList();
@@ -117,6 +138,7 @@ public class MusicService {
                 .totalMusicThisWeek(totalMusicThisWeek)
                 .totalMusicThisMonth(totalMusicThisMonth)
                 .totalMusicThisYear(totalMusicThisYear)
+                .totalMusicByStatus(totalMusicByStatus) // Gán tổng số bài hát theo trạng thái
                 .build();
     }
 

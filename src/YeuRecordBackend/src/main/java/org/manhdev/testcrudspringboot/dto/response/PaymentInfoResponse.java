@@ -15,6 +15,7 @@ public class PaymentInfoResponse {
     String accountName;
     String accountNumber;
     String paypalInfo;
+    double paypalAmount;
     String createdAt;
     String updatedAt;
 }

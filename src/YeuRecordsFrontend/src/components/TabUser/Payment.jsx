@@ -56,10 +56,22 @@ const Payment = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Kiểm tra nếu nhập PayPal hoặc đầy đủ thông tin ngân hàng
+    const isPaypalFilled = paypalId.trim() !== "";
+    const isBankFilled =
+      selectedBank?.name?.trim() !== "" &&
+      accountNumber.trim() !== "" &&
+      accountName.trim() !== "";
+
+    if (!isPaypalFilled && !isBankFilled) {
+      toast.error("Please enter either PayPal ID or complete bank details.");
+      return;
+    }
+
     try {
       const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
-      // Tạo payload dựa trên phương thức thanh toán
       const payload = {
         userId: userInfo.userId,
         bankName: selectedBank?.name || "",
@@ -80,7 +92,6 @@ const Payment = () => {
         if (error.response.status === 409) {
           toast.error(error.response.data.message);
         }
-
         if (error.response.status === 404) {
           toast.error("User not found.");
         }
@@ -235,6 +246,12 @@ const Payment = () => {
                     <strong>Email or id paypal:</strong>{" "}
                     <span className="underline italic">
                       {paymentInfo.paypalInfo}
+                    </span>
+                  </p>
+                  <p>
+                    <strong>Amount the company must pay:</strong>{" "}
+                    <span className="underline italic">
+                      {paymentInfo.paypalAmount} USD
                     </span>
                   </p>
                 </>
