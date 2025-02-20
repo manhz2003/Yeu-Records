@@ -5,6 +5,8 @@ import { Table } from "../../components/index";
 const { BsCloudDownload, IoSearch, FiTrash } = icons;
 import { apiGetAllLicense, apiDeleteLicenseById } from "../../apis";
 
+const { TbLicense } = icons;
+
 const ManageLicenses = () => {
   const [pageSize, setPageSize] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
@@ -130,8 +132,13 @@ const ManageLicenses = () => {
     <div className="p-4 flex flex-col gap-3">
       <div className="w-full shadow p-4 rounded-[6px] bg-white flex flex-col gap-4">
         <div className="flex items-center justify-between">
-          <div className="text-[#000] font-medium text-[17px] mb-0 hidden sm:block">
-            Data License
+          <div className="flex gap-3 items-center">
+            <div>
+              <TbLicense />
+            </div>
+            <div className="text-[#000] font-medium text-[17px] mb-0 hidden sm:block">
+              Data License
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <div className="flex items-center relative transition-all duration-500 ease-in-out w-[212px] sm:w-[240px]">

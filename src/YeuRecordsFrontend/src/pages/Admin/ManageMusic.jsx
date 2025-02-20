@@ -32,6 +32,8 @@ const {
   TbProgressAlert,
   TbProgressHelp,
   TbProgressCheck,
+  FcStatistics,
+  IoMusicalNotes,
 } = icons;
 
 const ManageMusic = () => {
@@ -362,8 +364,13 @@ const ManageMusic = () => {
     <>
       <div className="p-4 flex flex-col gap-3 w-full">
         <div className="w-full flex flex-col gap-4 bg-[#fff] rounded-[6px] text-[#fff] shadow p-4 select-none">
-          <div className="text-[#000] font-medium text-[17px]">
-            Statistical Music
+          <div className="flex items-center gap-3">
+            <div>
+              <FcStatistics />
+            </div>
+            <div className="text-[#000] font-medium text-[17px]">
+              Statistical Music
+            </div>
           </div>
           <div className="md:flex md:gap-4 items-center gap-8 flex-wrap">
             {/* Tổng số bài hát */}
@@ -490,8 +497,13 @@ const ManageMusic = () => {
         </div>
         <div className="w-full flex flex-col gap-4 shadow p-4 rounded-[6px] bg-[#fff]">
           <div className="flex items-center justify-between">
-            <div className="text-[#000] font-medium text-[17px] mb-0 hidden sm:block">
-              Data Artist
+            <div className="flex gap-3 items-center">
+              <div>
+                <IoMusicalNotes />
+              </div>
+              <div className="text-[#000] font-medium text-[17px] mb-0 hidden sm:block">
+                Data Music
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <div className="flex items-center relative transition-all duration-500 ease-in-out w-[300px] sm:w-[490px]">

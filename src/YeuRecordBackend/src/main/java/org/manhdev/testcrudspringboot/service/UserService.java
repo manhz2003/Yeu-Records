@@ -196,18 +196,22 @@ public class UserService {
     public UserListResponse getAllUsers(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        // Lấy tất cả người dùng
+        // Lấy danh sách người dùng
         Page<User> users = userRepository.findAll(pageable);
-
-        // Chuyển đổi User thành UserResponse
         List<UserResponse> userResponses = convertToUserResponses(users);
 
-        // Tính toán các thống kê người dùng
+        // Lấy thống kê
         int totalUser = (int) userRepository.count();
         int totalUserOnline = userRepository.countByStatusOnline(true);
         int totalUserNonActive = userRepository.countByActiveEmail(false);
         int totalAccountLocker = userRepository.countByStatus(2);
         int totalAccountNewToday = userRepository.countByCreatedAtAfter(getStartOfDay());
+
+        // Tính tổng số tiền còn nợ
+        Double totalAmountPayable = userRepository.getTotalAmountPayable();
+        if (totalAmountPayable == null) {
+            totalAmountPayable = 0.0; // Tránh null pointer
+        }
 
         return UserListResponse.builder()
                 .users(userResponses)
@@ -216,6 +220,7 @@ public class UserService {
                 .totalUserNonActive(totalUserNonActive)
                 .totalAccountLocker(totalAccountLocker)
                 .totalAccountNewToday(totalAccountNewToday)
+                .totalAmountPayable(totalAmountPayable) // ✅ Thêm vào response
                 .build();
     }
 

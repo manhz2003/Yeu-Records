@@ -87,8 +87,14 @@ import { GiFlatPlatform } from "react-icons/gi";
 import { TbProgressAlert } from "react-icons/tb";
 import { TbProgressHelp } from "react-icons/tb";
 import { TbProgressCheck } from "react-icons/tb";
+import { GiTakeMyMoney } from "react-icons/gi";
+import { FcStatistics } from "react-icons/fc";
+import { FaDigitalOcean } from "react-icons/fa";
 
 const icons = {
+  FaDigitalOcean,
+  FcStatistics,
+  GiTakeMyMoney,
   TbProgressAlert,
   TbProgressHelp,
   TbProgressCheck,

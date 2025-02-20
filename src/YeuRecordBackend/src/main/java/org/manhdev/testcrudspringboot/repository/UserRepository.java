@@ -41,4 +41,7 @@ public interface UserRepository extends JpaRepository<User, String> {
     List<Object[]> findFeaturedArtists();
 
     List<User> findAllByIdIn(List<String> ids);
+
+    @Query("SELECT SUM(u.amountPayable) FROM User u")
+    Double getTotalAmountPayable();
 }

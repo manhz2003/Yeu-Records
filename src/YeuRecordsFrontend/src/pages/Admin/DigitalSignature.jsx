@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import Swal from "sweetalert2";
 import { apiVerifySignature } from "../../apis";
 import CryptoJS from "crypto-js";
+import icons from "../../utils/icon";
+
+const { FaDigitalOcean, FaFileSignature } = icons;
 
 const DigitalSignature = () => {
   const [file, setFile] = useState(null);
@@ -120,8 +123,8 @@ const DigitalSignature = () => {
         });
 
         Swal.fire({
-          icon: "info",
-          title: "User Information",
+          icon: "success",
+          title: "Verify Signature",
           html: `
             <p><strong>Verify Signature:</strong> ${response?.data.result.signatureValid}</p>
           `,
@@ -147,8 +150,13 @@ const DigitalSignature = () => {
     <>
       <div className="p-4 flex flex-col gap-3">
         <div className="w-full shadow p-4 rounded-[6px] bg-white flex flex-col gap-4">
-          <div className="text-[#000] font-medium text-[17px] mb-0 hidden sm:block">
-            Verify Digital Signature in Music File
+          <div className="flex gap-3 items-center">
+            <div>
+              <FaDigitalOcean />
+            </div>
+            <div className="text-[#000] font-medium text-[17px] mb-0 hidden sm:block">
+              Verify Digital Signature in Music File
+            </div>
           </div>
 
           {/* Upload File */}
@@ -174,7 +182,12 @@ const DigitalSignature = () => {
           {/* Display Signature Information */}
           {musicInfo && (
             <div className="p-4 mt-4 border rounded-md bg-gray-100 leading-6">
-              <h4 className="text-lg font-semibold mb-2">Music Information:</h4>
+              <div className="flex gap-3 items-center mb-3">
+                <div>
+                  <FaFileSignature />
+                </div>
+                <div className="text-lg font-semibold ">Music Information:</div>
+              </div>
               <p>
                 <strong className=" font-medium">Digital Signature:</strong>{" "}
                 {musicInfo.digitalSignature}

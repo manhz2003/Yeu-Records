@@ -17,4 +17,5 @@ public class UserListResponse {
     int totalUserNonActive;
     int totalAccountLocker;
     int totalAccountNewToday;
+    double totalAmountPayable;
 }

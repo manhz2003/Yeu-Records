@@ -16,6 +16,7 @@ const {
   IoIosClose,
   FiEdit,
   FiTrash,
+  FcStatistics,
 } = icons;
 
 import {
@@ -268,8 +269,13 @@ const ManageCategories = () => {
     <>
       <div className="p-4 flex flex-col gap-3 ">
         <div className="w-full flex flex-col gap-4 bg-[#fff] rounded-[6px] text-[#fff] shadow p-4 select-none">
-          <div className="text-[#000] font-medium text-[17px]">
-            Statistical Category
+          <div className="flex items-center gap-3">
+            <div>
+              <FcStatistics />
+            </div>
+            <div className="text-[#000] font-medium text-[17px]">
+              Statistical Category
+            </div>
           </div>
           <div className="md:flex md:gap-4 items-center gap-8 flex-wrap">
             <div className="flex flex-col items-center gap-2 p-4 bg-[#4C8BF5] rounded-[6px] shadow md:w-[216px]">
@@ -335,8 +341,14 @@ const ManageCategories = () => {
         </div>
         <div className="w-full flex flex-col gap-4 shadow p-4 rounded-[6px] bg-[#fff]">
           <div className="flex items-center justify-between">
-            <div className="text-[#000] font-medium text-[17px] mb-0 hidden sm:block">
-              Data Category Or Album
+            <div className="flex gap-3 items-center">
+              <div>
+                <MdOutlineCategory />
+              </div>
+
+              <div className="text-[#000] font-medium text-[17px] mb-0 hidden sm:block">
+                Data Category Or Album
+              </div>
             </div>
 
             <div className="flex items-center gap-2">
