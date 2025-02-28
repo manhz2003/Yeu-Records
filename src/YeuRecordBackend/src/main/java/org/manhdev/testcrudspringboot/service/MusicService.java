@@ -8,6 +8,7 @@ import org.manhdev.testcrudspringboot.constant.MessageConstant;
 import org.manhdev.testcrudspringboot.dto.request.MusicRequest;
 import org.manhdev.testcrudspringboot.dto.request.UpdateMusicStatusRequest;
 import org.manhdev.testcrudspringboot.dto.request.UpdatePlatformRequest;
+import org.manhdev.testcrudspringboot.dto.request.UpdateUpcIsrcRequest;
 import org.manhdev.testcrudspringboot.dto.response.MusicResponse;
 import org.manhdev.testcrudspringboot.dto.response.StatisticsMusicResponse;
 import org.manhdev.testcrudspringboot.dto.response.StatusMusicCountResponse;
@@ -242,6 +243,23 @@ public class MusicService {
         music.setPlatformReleased(request.getPlatformReleased());
         Music updatedMusic = musicRepository.save(music);
 
+        return musicMapper.toResponse(updatedMusic);
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    public MusicResponse updateUpcOrIsrc(String musicId, UpdateUpcIsrcRequest request) {
+        Music music = musicRepository.findById(musicId)
+                .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.MUSIC_NOT_FOUND));
+
+        // Nếu request gửi null thì giữ nguyên, nếu gửi "" thì xóa giá trị
+        if (request.getUpc() != null) {
+            music.setUpc(request.getUpc()); // Chấp nhận cả "" (xóa UPC)
+        }
+        if (request.getIsrc() != null) {
+            music.setIsrc(request.getIsrc()); // Chấp nhận cả "" (xóa ISRC)
+        }
+
+        Music updatedMusic = musicRepository.save(music);
         return musicMapper.toResponse(updatedMusic);
     }
 

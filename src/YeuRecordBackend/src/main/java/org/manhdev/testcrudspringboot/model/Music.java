@@ -49,6 +49,12 @@ public class Music {
     @Column(columnDefinition = "TEXT")
     String platformReleased;
 
+    @Column(columnDefinition = "TEXT")
+    String upc;
+
+    @Column(columnDefinition = "TEXT")
+    String isrc;
+
     @Temporal(TemporalType.TIMESTAMP)
     Date createdAt;
 

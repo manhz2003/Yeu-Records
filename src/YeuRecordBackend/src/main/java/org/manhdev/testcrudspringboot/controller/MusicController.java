@@ -6,10 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.manhdev.testcrudspringboot.constant.MessageConstant;
 import org.manhdev.testcrudspringboot.constant.PaginationConstants;
-import org.manhdev.testcrudspringboot.dto.request.ApiResponse;
-import org.manhdev.testcrudspringboot.dto.request.MusicRequest;
-import org.manhdev.testcrudspringboot.dto.request.UpdateMusicStatusRequest;
-import org.manhdev.testcrudspringboot.dto.request.UpdatePlatformRequest;
+import org.manhdev.testcrudspringboot.dto.request.*;
 import org.manhdev.testcrudspringboot.dto.response.MusicResponse;
 import org.manhdev.testcrudspringboot.dto.response.StatisticsMusicResponse;
 import org.manhdev.testcrudspringboot.service.MusicService;
@@ -129,5 +126,23 @@ public class MusicController {
 
         return ResponseEntity.ok(apiResponse);
     }
+
+    @PutMapping("/{musicId}/update-upc-isrc")
+    public ResponseEntity<ApiResponse<MusicResponse>> updateUpcOrIsrc(
+            @PathVariable String musicId,
+            @RequestBody @Valid UpdateUpcIsrcRequest request) {
+
+        MusicResponse updatedMusic = musicService.updateUpcOrIsrc(musicId, request);
+
+        ApiResponse<MusicResponse> apiResponse = ApiResponse.<MusicResponse>builder()
+                .code(HttpStatus.OK.value())
+                .message("Updated UPC/ISRC successfully")
+                .result(updatedMusic)
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
+
 
 }

@@ -53,3 +53,10 @@ export const apiUpdatePlatformMusic = (id, data) =>
     data,
     method: "put",
   });
+
+export const apiUpdateUpcOrIsrc = (id, data) =>
+  instance({
+    url: `music/${id}/update-upc-isrc`,
+    data,
+    method: "put",
+  });

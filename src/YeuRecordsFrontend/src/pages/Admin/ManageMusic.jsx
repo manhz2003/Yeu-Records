@@ -10,12 +10,11 @@ import {
   apiGetAllStatusMusic,
   apiUpdateStatusMusic,
   apiUpdatePlatformMusic,
+  apiUpdateUpcOrIsrc,
 } from "../../apis";
 import { toast } from "react-toastify";
 import { data } from "autoprefixer";
-
 import { useFormik } from "formik";
-import * as Yup from "yup";
 
 const {
   IoSearch,
@@ -220,6 +219,8 @@ const ManageMusic = () => {
     { label: "collab", accessor: "description" },
     { label: "Status Music", accessor: "statusMusic" },
     { label: "Platform Released", accessor: "platformReleased" },
+    { label: "upc", accessor: "upc" },
+    { label: "isrc", accessor: "isrc" },
     { label: "Created At", accessor: "createdAt" },
     { label: "Updated At", accessor: "updatedAt" },
   ];
@@ -311,25 +312,48 @@ const ManageMusic = () => {
     setSelectedMusic(row);
   };
 
-  console.log(selectedMusic);
-
   const formik = useFormik({
     initialValues: {
       platformReleased: selectedMusic?.platformReleased || "",
+      upc: selectedMusic?.upc || "",
+      isrc: selectedMusic?.isrc || "",
     },
     enableReinitialize: true,
     onSubmit: async (values) => {
       try {
-        if (selectedMusic) {
-          await apiUpdatePlatformMusic(selectedMusic?.id, {
-            platformReleased: values?.platformReleased,
-          });
+        if (!selectedMusic) return;
 
-          toast.success("Platform released updated successfully!");
+        const updateRequests = [];
+
+        // Kiểm tra cập nhật Platform Released
+        if (values.platformReleased !== selectedMusic.platformReleased) {
+          updateRequests.push(
+            apiUpdatePlatformMusic(selectedMusic.id, {
+              platformReleased: values.platformReleased.trim(),
+            })
+          );
+        }
+
+        // Kiểm tra cập nhật UPC & ISRC (gửi luôn dù là rỗng)
+        if (
+          values.upc !== selectedMusic.upc ||
+          values.isrc !== selectedMusic.isrc
+        ) {
+          updateRequests.push(
+            apiUpdateUpcOrIsrc(selectedMusic.id, {
+              upc: values.upc, // Cho phép rỗng ""
+              isrc: values.isrc, // Cho phép rỗng ""
+            })
+          );
+        }
+
+        if (updateRequests.length > 0) {
+          await Promise.all(updateRequests); // Chạy API song song
+          toast.success("Music information updated successfully!");
           fetchDataMusic();
         }
 
-        // Clear form
+        // Reset form và đóng modal
         formik.resetForm();
         setIsModalOpen(false);
       } catch (error) {
@@ -570,9 +594,10 @@ const ManageMusic = () => {
                 <IoIosClose size="26px" />
               </button>
               <h2 className="text-left text-lg font-semibold mb-4">
-                Update Platform Released
+                Update Music Info
               </h2>
               <form onSubmit={formik.handleSubmit}>
+                {/* Platform Released */}
                 <div className="mb-4">
                   <label className="block font-medium text-gray-700 mb-1">
                     Platform Released
@@ -583,20 +608,41 @@ const ManageMusic = () => {
                     value={formik.values.platformReleased}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    className={`w-full px-3 py-2 border rounded-[6px] ${
-                      formik.touched.nameCategory &&
-                      formik.errors.platformReleased
-                        ? "border-red-500"
-                        : "border-gray-300"
-                    }`}
-                    placeholder="Enter category name"
+                    className="w-full px-3 py-2 border rounded-[6px] border-gray-300"
+                    placeholder="Enter platform release name"
                   />
-                  {formik.touched.platformReleased &&
-                    formik.errors.platformReleased && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {formik.errors.platformReleased}
-                      </p>
-                    )}
+                </div>
+
+                {/* UPC */}
+                <div className="mb-4">
+                  <label className="block font-medium text-gray-700 mb-1">
+                    UPC
+                  </label>
+                  <input
+                    type="text"
+                    name="upc"
+                    value={formik.values.upc}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className="w-full px-3 py-2 border rounded-[6px] border-gray-300"
+                    placeholder="Enter UPC"
+                  />
+                </div>
+
+                {/* ISRC */}
+                <div className="mb-4">
+                  <label className="block font-medium text-gray-700 mb-1">
+                    ISRC
+                  </label>
+                  <input
+                    type="text"
+                    name="isrc"
+                    value={formik.values.isrc}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className="w-full px-3 py-2 border rounded-[6px] border-gray-300"
+                    placeholder="Enter ISRC"
+                  />
                 </div>
 
                 <div className="flex justify-between mt-4">
