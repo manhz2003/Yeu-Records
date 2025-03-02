@@ -72,6 +72,6 @@ public class Music {
         this.updatedAt = new Date();
     }
 
-    @OneToMany(mappedBy ="music", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "music", cascade = CascadeType.ALL, orphanRemoval = true)
     List<License> licenses;
 }

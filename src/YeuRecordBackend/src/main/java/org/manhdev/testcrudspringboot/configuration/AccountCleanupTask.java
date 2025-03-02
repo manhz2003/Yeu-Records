@@ -1,10 +1,14 @@
 package org.manhdev.testcrudspringboot.configuration;
 
+import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.manhdev.testcrudspringboot.model.Music;
+import org.manhdev.testcrudspringboot.model.User;
 import org.manhdev.testcrudspringboot.service.DigitalSignatureService;
+import org.manhdev.testcrudspringboot.service.EmailService;
 import org.manhdev.testcrudspringboot.service.MusicService;
 import org.manhdev.testcrudspringboot.service.UserService;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +18,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 
 @Configuration
 @Slf4j
@@ -28,6 +33,7 @@ public class AccountCleanupTask {
     UserService userService;
     MusicService musicService;
     DigitalSignatureService digitalSignatureService;
+    EmailService emailService;
 
     // Xóa các tài khoản không kích hoạt sau 24h
     @Scheduled(fixedRate = 86400000)
@@ -48,10 +54,34 @@ public class AccountCleanupTask {
     }
 
     // Lịch trình xóa các bản ghi Music không có License sau 7 ngày
-    @Scheduled(fixedRate = 604800000)
+    @Scheduled(fixedRate = 604800000) // 7 ngày
     public void cleanupOrphanMusic() {
-        Long total = musicService.deleteOrphanMusic();
-        log.info("Đã xóa các bản ghi Music không có License. {}", total);
+        // Lấy danh sách các bài nhạc bị xóa
+        List<Music> deletedMusicList = musicService.findOrphanMusic();
+
+        // Kiểm tra nếu có bài nhạc bị xóa
+        if (!deletedMusicList.isEmpty()) {
+            deletedMusicList.forEach(music -> {
+                User owner = music.getUser(); // Giả sử mỗi bài nhạc có 1 chủ sở hữu
+                if (owner != null) {
+                    try {
+                        String subject = "Your music has been removed";
+                        String reason = "Your song was deleted due to lack of a valid license.";
+                        emailService.sendMusicDeletionNotification(owner.getEmail(), subject, reason);
+                        log.info("Đã gửi email thông báo xóa nhạc đến {}", owner.getEmail());
+                    } catch (MessagingException e) {
+                        log.error("Lỗi khi gửi email xóa nhạc: {}", e.getMessage());
+                    }
+                }
+            });
+
+            // Xóa các bài nhạc không có License
+            Long totalDeleted = musicService.deleteOrphanMusic();
+            log.info("Đã xóa {} bản nhạc không có License.", totalDeleted);
+        } else {
+            log.info("Không có bản nhạc nào cần xóa.");
+        }
     }
+
 
 }

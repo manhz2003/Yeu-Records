@@ -1,5 +1,6 @@
 package org.manhdev.testcrudspringboot.service;
 
+import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -40,6 +41,7 @@ public class MusicService {
     MusicMapper musicMapper;
     CloudinaryService cloudinaryService;
     StatusMusicRepository statusMusicRepository;
+    EmailService emailService;
 
     //    create music
     public MusicResponse createMusic(MusicRequest request) {
@@ -146,6 +148,8 @@ public class MusicService {
     //    xóa music theo id
     public void deleteMusic(String musicId) {
         Music music = getMusicById(musicId);
+        String userEmail = music.getUser().getEmail();
+
         if (music.getThumbnailUrl() != null && music.getMusicUrl() != null) {
             try {
                 String oldImageMusicPublicId = getPublicIdFromUrl(music.getThumbnailUrl());
@@ -153,10 +157,22 @@ public class MusicService {
                 cloudinaryService.deleteFile(oldImageMusicPublicId, "raw");
                 cloudinaryService.deleteFile(oldMusicFilePublicId, "raw");
             } catch (IOException e) {
-                log.error("Lỗi khi xóa music và ảnh music từ Cloudinary: {}", e.getMessage());
+                log.error("Lỗi khi xóa nhạc và ảnh từ Cloudinary: {}", e.getMessage());
             }
         }
+
         musicRepository.deleteById(musicId);
+
+        // Gửi email thông báo
+        try {
+            emailService.sendMusicDeletionNotification(
+                    userEmail,
+                    "Your song has been deleted",
+                    "Your song '" + music.getMusicName() + "' has been removed from our platform."
+            );
+        } catch (MessagingException e) {
+            log.error("Lỗi khi gửi email thông báo xóa nhạc: {}", e.getMessage());
+        }
     }
 
     // Kiểm tra sự tồn tại của music
@@ -217,6 +233,10 @@ public class MusicService {
     // Phương thức xóa các Music không có License
     public Long deleteOrphanMusic() {
         return musicRepository.deleteByLicensesIsNull();
+    }
+
+    public List<Music> findOrphanMusic() {
+        return musicRepository.findOrphanMusic();
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")

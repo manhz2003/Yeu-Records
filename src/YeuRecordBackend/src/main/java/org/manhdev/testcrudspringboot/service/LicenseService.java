@@ -1,5 +1,6 @@
 package org.manhdev.testcrudspringboot.service;
 
+import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -34,6 +35,7 @@ public class LicenseService {
     UserRepository userRepository;
     MusicRepository musicRepository;
     CloudinaryService cloudinaryService;
+    EmailService emailService;
 
     //    create license
     public LicenseResponse createLicense(LicenseRequest licenseRequest) {
@@ -41,8 +43,19 @@ public class LicenseService {
         Music music = getMusicById(licenseRequest.getMusicId());
         License license = licenseMapper.toEntity(licenseRequest, user, music);
         licenseRepository.save(license);
+
+        // 📧 Gửi email thông báo phát hành nhạc
+        try {
+            String subject = "Notification of successful music playback";
+            emailService.sendMusicReleaseNotification(user.getEmail(), subject, true);
+            log.info("Đã gửi email thông báo phát hành nhạc đến {}", user.getEmail());
+        } catch (MessagingException e) {
+            log.error("Gửi email thất bại: {}", e.getMessage());
+        }
+
         return licenseMapper.toResponse(license);
     }
+
 
     private User getUserById(String userId) {
         UserAccessUtils.checkUserAccess(userId);

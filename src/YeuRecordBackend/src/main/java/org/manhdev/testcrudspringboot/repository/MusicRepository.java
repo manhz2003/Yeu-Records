@@ -3,7 +3,6 @@ package org.manhdev.testcrudspringboot.repository;
 import jakarta.transaction.Transactional;
 import org.manhdev.testcrudspringboot.model.Category;
 import org.manhdev.testcrudspringboot.model.Music;
-import org.manhdev.testcrudspringboot.model.StatusMusic;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -47,5 +46,9 @@ public interface MusicRepository extends JpaRepository<Music, String> {
 
     @Query("SELECT s.nameStatus, COUNT(m) FROM Music m JOIN m.statusMusic s GROUP BY s.nameStatus")
     List<Object[]> countSongsByStatus();
+
+    // Tìm các bài nhạc không có giấy phép
+    @Query("SELECT m FROM Music m WHERE m.id NOT IN (SELECT l.music.id FROM License l)")
+    List<Music> findOrphanMusic();
 
 }
