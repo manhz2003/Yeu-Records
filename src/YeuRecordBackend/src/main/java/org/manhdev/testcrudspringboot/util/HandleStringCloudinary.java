@@ -30,7 +30,7 @@ public class HandleStringCloudinary {
             publicId.deleteCharAt(publicId.length() - 1);
         }
 
-        log.info("Extracted publicId: {}", publicId.toString());
+        log.info("Extracted publicId: {}", publicId);
         return publicId.toString();
     }
 

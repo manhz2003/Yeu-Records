@@ -14,20 +14,17 @@ public class FirebaseConfig {
 
     @Bean
     public FirebaseApp firebaseApp() throws IOException {
-        // Kiểm tra nếu FirebaseApp đã tồn tại
         if (FirebaseApp.getApps().isEmpty()) {
             FileInputStream serviceAccount =
                     new FileInputStream("src/main/resources/serviceAccountKey.json");
 
-            FirebaseOptions options = new FirebaseOptions.Builder()
+            FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build();
 
-            // Khởi tạo FirebaseApp
             return FirebaseApp.initializeApp(options);
         }
 
-        // Trả về FirebaseApp mặc định nếu đã tồn tại
         return FirebaseApp.getInstance();
     }
 }

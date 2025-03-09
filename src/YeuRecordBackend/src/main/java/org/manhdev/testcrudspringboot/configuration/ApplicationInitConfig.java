@@ -3,6 +3,8 @@ package org.manhdev.testcrudspringboot.configuration;
 import java.util.HashSet;
 import java.util.List;
 
+import lombok.experimental.NonFinal;
+import org.springframework.beans.factory.annotation.Value;
 import org.manhdev.testcrudspringboot.constant.PredefinedRole;
 import org.manhdev.testcrudspringboot.model.Role;
 import org.manhdev.testcrudspringboot.model.StatusMusic;
@@ -10,8 +12,7 @@ import org.manhdev.testcrudspringboot.model.User;
 import org.manhdev.testcrudspringboot.repository.RoleRepository;
 import org.manhdev.testcrudspringboot.repository.StatusMusicRepository;
 import org.manhdev.testcrudspringboot.repository.UserRepository;
-import org.manhdev.testcrudspringboot.service.DigitalSignatureService;  // import service tạo chữ ký số
-import org.manhdev.testcrudspringboot.service.StatusMusicService;
+import org.manhdev.testcrudspringboot.service.DigitalSignatureService;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -21,7 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 
 @Configuration
@@ -34,10 +34,12 @@ public class ApplicationInitConfig {
     StatusMusicRepository statusMusicRepository;
 
     @NonFinal
-    static final String ADMIN_USER_NAME = "azusa.producer@gmail.com";
+    @Value("${admin.default.username}")
+    private String adminUsername;
 
     @NonFinal
-    static final String ADMIN_PASS = "Yeurecord686868";
+    @Value("${admin.default.password}")
+    private String adminPassword;
 
     @Bean
     @ConditionalOnProperty(
@@ -47,7 +49,7 @@ public class ApplicationInitConfig {
     ApplicationRunner applicationRunner(UserRepository userRepository, RoleRepository roleRepository) {
         log.info("Khởi tạo ứng dụng");
         return args -> {
-            if (userRepository.findByEmail(ADMIN_USER_NAME).isEmpty()) {
+            if (userRepository.findByEmail(adminUsername).isEmpty()) {
                 roleRepository.save(Role.builder()
                         .name(PredefinedRole.USER_ROLE)
                         .description("Đây là quyền của nghệ sĩ")
@@ -62,8 +64,8 @@ public class ApplicationInitConfig {
                 roles.add(adminRole);
 
                 User user = User.builder()
-                        .email(ADMIN_USER_NAME)
-                        .password(passwordEncoder.encode(ADMIN_PASS))
+                        .email(adminUsername)
+                        .password(passwordEncoder.encode(adminPassword))
                         .oauthProvider("system")
                         .fullname("Nguyen Thanh Hai")
                         .roles(roles)
@@ -99,4 +101,5 @@ public class ApplicationInitConfig {
             log.info("Đã hoàn tất khởi tạo ứng dụng .....");
         };
     }
+
 }

@@ -21,6 +21,10 @@ public enum ErrorCode {
     NEW_PASSWORD_SAME_AS_OLD(400, "Mật khẩu mới không được trùng với mật khẩu cũ", HttpStatus.BAD_REQUEST),
     INTERNAL_SERVER_ERROR(500, "Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR),
     ACCOUNT_OR_PASS_INVALID(400, "Tài khoản hoặc mật khẩu không chính xác", HttpStatus.BAD_REQUEST),
+    TOKEN_GENERATION_FAILED(500, "Lỗi khi tạo refresh token", HttpStatus.INTERNAL_SERVER_ERROR),
+    TOKEN_VERIFICATION_FAILED(401, "Token không hợp lệ hoặc đã hết hạn", HttpStatus.UNAUTHORIZED),
+    TOKEN_CREATION_FAILED(500, "Lỗi khi tạo access token", HttpStatus.INTERNAL_SERVER_ERROR),
+
 
 //    những error code bắt bằng exception custom hoặc của hệ thống
     UNCATEGORIZED_EXCEPTION(500, "ngoại lệ chưa được phân loại", HttpStatus.INTERNAL_SERVER_ERROR),

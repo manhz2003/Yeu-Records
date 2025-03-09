@@ -81,7 +81,7 @@ public class AuthenticationController {
     //    Đăng xuất giúp vô hiệu hóa token hoặc session đang hoạt động, ngăn chặn việc người khác lợi dụng
     //    thông tin đăng nhập cũ để truy cập trái phép vào hệ thống.
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<Void>> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
+    public ResponseEntity<ApiResponse<Void>> logout(@RequestBody LogoutRequest request) {
         return authenticationService.logout(request);
     }
 

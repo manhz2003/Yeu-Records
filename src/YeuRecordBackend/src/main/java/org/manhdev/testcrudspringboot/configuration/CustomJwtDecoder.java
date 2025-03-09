@@ -4,9 +4,12 @@ import java.text.ParseException;
 import java.util.Objects;
 import javax.crypto.spec.SecretKeySpec;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import org.manhdev.testcrudspringboot.dto.request.IntrospectRequest;
 import org.manhdev.testcrudspringboot.service.AuthenticationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -18,16 +21,19 @@ import org.springframework.stereotype.Component;
 import com.nimbusds.jose.JOSEException;
 
 @Component
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 // lớp này dùng để giải mã token và kiểm tra tính hợp lệ của token
 public class CustomJwtDecoder implements JwtDecoder {
+
+    @NonFinal
     @Value("${jwt.signerKey}")
-    private String signerKey;
+    String signerKey;
 
-    @Autowired
-    private AuthenticationService authenticationService;
-
+     AuthenticationService authenticationService;
     //    dùng để giải mã (decode) và xác thực (validate) token JWT dựa trên khóa bí mật và
     //    thuật toán mã hóa HMAC-SHA512 (HS512).
+    @NonFinal
     private NimbusJwtDecoder nimbusJwtDecoder = null;
 
     @Override

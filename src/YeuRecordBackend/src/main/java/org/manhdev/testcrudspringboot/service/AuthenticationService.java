@@ -56,15 +56,15 @@ public class AuthenticationService {
 
     @NonFinal
     @Value("${jwt.signerKey}")
-    protected String SIGNER_KEY;
+    protected String signerKey;
 
     @NonFinal
     @Value("${jwt.valid-duration}")
-    protected long VALID_DURATION;
+    protected long validDuration;
 
     @NonFinal
     @Value("${jwt.refreshable-duration}")
-    protected long REFRESHABLE_DURATION;
+    protected long refreshableDuration;
 
     public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException {
         var token = request.getToken();
@@ -111,13 +111,12 @@ public class AuthenticationService {
     private String generateRefreshToken(User user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
-        // Tạo refresh token với thời gian sống dài hơn
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getEmail())
                 .issuer("manhdev")
                 .issueTime(new Date())
                 .expirationTime(new Date(
-                        Instant.now().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
+                        Instant.now().plus(refreshableDuration, ChronoUnit.SECONDS).toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("userId", user.getId())
                 .build();
@@ -126,15 +125,15 @@ public class AuthenticationService {
         JWSObject jwsObject = new JWSObject(header, payload);
 
         try {
-            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
+            jwsObject.sign(new MACSigner(signerKey.getBytes()));
             return jwsObject.serialize();
         } catch (JOSEException e) {
             log.error("Cannot create refresh token", e);
-            throw new RuntimeException(e);
+            throw new AppException(ErrorCode.TOKEN_GENERATION_FAILED);
         }
     }
 
-    public ResponseEntity<ApiResponse<Void>> logout(LogoutRequest request) throws ParseException, JOSEException {
+    public ResponseEntity<ApiResponse<Void>> logout(LogoutRequest request)  {
         try {
             // Kiểm tra người dùng theo email để cập nhật trạng thái logout
             var user = userRepository.findByEmail(request.getEmail())
@@ -177,7 +176,7 @@ public class AuthenticationService {
         Date issueTime = signedJWT.getJWTClaimsSet().getIssueTime();
 
         // Tính toán thời gian hết hạn của refresh token dựa trên thời gian phát hành
-        Date refreshTokenExpiryTime = Date.from(issueTime.toInstant().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS));
+        Date refreshTokenExpiryTime = Date.from(issueTime.toInstant().plus(refreshableDuration, ChronoUnit.SECONDS));
 
         // Kiểm tra nếu refresh token đã hết hạn
         if (new Date().after(refreshTokenExpiryTime)) {
@@ -219,7 +218,7 @@ public class AuthenticationService {
                 .issuer("manhdev")
                 .issueTime(new Date())
                 .expirationTime(new Date(
-                        Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
+                        Instant.now().plus(validDuration, ChronoUnit.SECONDS).toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("userId", user.getId())
                 .claim("email", user.getEmail())
@@ -236,7 +235,7 @@ public class AuthenticationService {
         JWSObject jwsObject = new JWSObject(header, payload);
 
         try {
-            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
+            jwsObject.sign(new MACSigner(signerKey.getBytes()));
             String token = jwsObject.serialize();
 
             // Lưu token vào User
@@ -245,19 +244,19 @@ public class AuthenticationService {
 
             return token;
         } catch (JOSEException e) {
-            log.error("Cannot create token", e);
-            throw new RuntimeException(e);
+            log.error("Cannot create access token", e);
+            throw new AppException(ErrorCode.TOKEN_CREATION_FAILED);
         }
     }
 
     private SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {
-        JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+        JWSVerifier verifier = new MACVerifier(signerKey.getBytes());
         SignedJWT signedJWT = SignedJWT.parse(token);
 
         // Kiểm tra thời gian hết hạn
         Date expiryTime = (isRefresh)
                 ? new Date(signedJWT.getJWTClaimsSet().getIssueTime().toInstant()
-                .plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS).toEpochMilli())
+                .plus(refreshableDuration, ChronoUnit.SECONDS).toEpochMilli())
                 : signedJWT.getJWTClaimsSet().getExpirationTime();
 
         var verified = signedJWT.verify(verifier);
