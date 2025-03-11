@@ -128,6 +128,69 @@ const SubmitMusic = () => {
     return CryptoJS.AES.encrypt(signatureData, secretKey).toString();
   };
 
+  // const embedSignatureInMp3 = async (
+  //   file,
+  //   musicName,
+  //   digitalSignature,
+  //   publicKey,
+  //   certificate,
+  //   secretKey
+  // ) => {
+  //   const fileBuffer = await file.arrayBuffer();
+
+  //   // Chuẩn bị dữ liệu chữ ký số dưới dạng JSON
+  //   const signatureData = JSON.stringify({
+  //     musicName,
+  //     digitalSignature,
+  //     publicKey,
+  //     certificate,
+  //   });
+
+  //   // Mã hóa dữ liệu chữ ký
+  //   const encryptedSignature = encryptSignature(signatureData, secretKey);
+
+  //   // Mã hóa Base64 dữ liệu đã mã hóa
+  //   const encodedSignature = btoa(
+  //     unescape(encodeURIComponent(encryptedSignature))
+  //   ); // Đảm bảo không lỗi ký tự đặc biệt
+  //   const signaturePrefix = "SIGNATURE";
+
+  //   // Tạo buffer mới để kết hợp dữ liệu gốc + chữ ký
+  //   const combinedBuffer = new Uint8Array(
+  //     fileBuffer.byteLength + signaturePrefix.length + encodedSignature.length
+  //   );
+
+  //   // Sao chép dữ liệu file gốc
+  //   combinedBuffer.set(new Uint8Array(fileBuffer), 0);
+
+  //   // Sao chép chuỗi "SIGNATURE"
+  //   combinedBuffer.set(
+  //     Uint8Array.from(
+  //       signaturePrefix.split("").map((char) => char.charCodeAt(0))
+  //     ),
+  //     fileBuffer.byteLength
+  //   );
+
+  //   // Sao chép dữ liệu chữ ký
+  //   combinedBuffer.set(
+  //     Uint8Array.from(
+  //       encodedSignature.split("").map((char) => char.charCodeAt(0))
+  //     ),
+  //     fileBuffer.byteLength + signaturePrefix.length
+  //   );
+
+  //   // Trả về file mới
+  //   return new File([combinedBuffer], file.name, { type: file.type });
+  // };
+
+  const getSongSnippet = async (file) => {
+    const buffer = await file.arrayBuffer();
+    const snippetSize = 4096; // Lấy 4KB đầu tiên
+    return btoa(
+      String.fromCharCode(...new Uint8Array(buffer.slice(0, snippetSize)))
+    );
+  };
+
   const embedSignatureInMp3 = async (
     file,
     musicName,
@@ -137,10 +200,12 @@ const SubmitMusic = () => {
     secretKey
   ) => {
     const fileBuffer = await file.arrayBuffer();
+    const songSnippet = await getSongSnippet(file); // Lấy đoạn đầu của file nhạc
 
     // Chuẩn bị dữ liệu chữ ký số dưới dạng JSON
     const signatureData = JSON.stringify({
       musicName,
+      songSnippet, // Nhúng songSnippet vào chữ ký
       digitalSignature,
       publicKey,
       certificate,
@@ -148,21 +213,18 @@ const SubmitMusic = () => {
 
     // Mã hóa dữ liệu chữ ký
     const encryptedSignature = encryptSignature(signatureData, secretKey);
-
-    // Mã hóa Base64 dữ liệu đã mã hóa
     const encodedSignature = btoa(
       unescape(encodeURIComponent(encryptedSignature))
-    ); // Đảm bảo không lỗi ký tự đặc biệt
+    );
     const signaturePrefix = "SIGNATURE";
 
-    // Tạo buffer mới để kết hợp dữ liệu gốc + chữ ký
+    // Tạo buffer mới để kết hợp dữ liệu file + chữ ký
     const combinedBuffer = new Uint8Array(
       fileBuffer.byteLength + signaturePrefix.length + encodedSignature.length
     );
 
     // Sao chép dữ liệu file gốc
     combinedBuffer.set(new Uint8Array(fileBuffer), 0);
-
     // Sao chép chuỗi "SIGNATURE"
     combinedBuffer.set(
       Uint8Array.from(
@@ -170,7 +232,6 @@ const SubmitMusic = () => {
       ),
       fileBuffer.byteLength
     );
-
     // Sao chép dữ liệu chữ ký
     combinedBuffer.set(
       Uint8Array.from(
@@ -179,7 +240,6 @@ const SubmitMusic = () => {
       fileBuffer.byteLength + signaturePrefix.length
     );
 
-    // Trả về file mới
     return new File([combinedBuffer], file.name, { type: file.type });
   };
 
@@ -235,11 +295,12 @@ const SubmitMusic = () => {
 
       // Lấy tên nhạc từ form
       const musicName = values.trackName;
+      const songSnippet = await getSongSnippet(selectedFile); // Lấy đoạn đầu của file nhạc
 
       // Nhúng chữ ký vào file nhạc
       const signedFile = await embedSignatureInMp3(
         selectedFile,
-        musicName, // Truyền musicName vào
+        musicName,
         digitalSignature,
         publicKey,
         certificate,
@@ -268,6 +329,7 @@ const SubmitMusic = () => {
         musicUrl: musicResponse.secure_url,
         userId: dataArtist?.userId,
         fileFormat: selectedFile.type,
+        songSnippet, // Gửi thêm songSnippet lên backend
       };
 
       const response = await apiCreateMusic(musicDataApi);
