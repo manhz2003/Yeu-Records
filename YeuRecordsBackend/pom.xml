@@ -111,26 +111,26 @@
             <scope>test</scope>
         </dependency>
 
-<!--        thư viện gửi mail-->
+        <!--        thư viện gửi mail-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
-<!--        thư viện hỗ trợ đăng nhập facebook, google-->
+        <!--        thư viện hỗ trợ đăng nhập facebook, google-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-client</artifactId>
         </dependency>
 
-<!--        thư viện firebase dành cho admin-->
+        <!--        thư viện firebase dành cho admin-->
         <dependency>
             <groupId>com.google.firebase</groupId>
             <artifactId>firebase-admin</artifactId>
             <version>9.4.1</version>
         </dependency>
 
-<!--        cloud cloudinary-->
+        <!--        cloud cloudinary-->
         <dependency>
             <groupId>com.cloudinary</groupId>
             <artifactId>cloudinary-http44</artifactId>
@@ -141,6 +141,14 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>org.manhdev.yeurecords.YeuRecords</mainClass>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
