@@ -18,7 +18,7 @@ export const apiLogin = (data) => {
 
 // API logout
 export const apiLogout = (data) => {
-  return axios.post("auth/logout", {
+  return axios.post("http://localhost:8099/auth/logout", {
     token: data.token,
     email: data.email,
   });
