@@ -1,4 +1,4 @@
-import bannerLogo from "../../assets/images/Header.png";
+import bannerLogo from "../../assets/images/header.png";
 import { Link } from "react-router-dom";
 import icons from "../../utils/icon";
 import path from "../../utils/path";
